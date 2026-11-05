@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -158,8 +159,15 @@ function MarkdownViewer({ entry, onBack, onPrev, prev, onNext, next }) {
   );
 }
 
-export function Glossary() {
-  const [activeId, setActiveId] = useState(null);
+export function Glossary({ embedded = false }) {
+  const { id: routeId } = useParams();
+  const navigate = useNavigate();
+  const [localId, setLocalId] = useState(null);
+  const activeId = embedded ? localId : routeId;
+  const openEntry = (id) =>
+    embedded ? setLocalId(id) : navigate(`/glossary/${id}`);
+  const closeEntry = () =>
+    embedded ? setLocalId(null) : navigate("/glossary");
   const active = glossary.find((entry) => entry.id === activeId) ?? null;
   const index = glossary.findIndex((entry) => entry.id === activeId);
   const prev = index > 0 ? glossary[index - 1] : null;
@@ -171,15 +179,15 @@ export function Glossary() {
         <MarkdownViewer
           key={active.id}
           entry={active}
-          onBack={() => setActiveId(null)}
-          onPrev={() => setActiveId(prev.id)}
+          onBack={closeEntry}
+          onPrev={() => openEntry(prev.id)}
           prev={prev}
-          onNext={() => setActiveId(next.id)}
+          onNext={() => openEntry(next.id)}
           next={next}
         />
       ) : (
         <PatternPage>
-          <HeaderBar />
+          <HeaderBar showAchievements={!embedded} />
           <main className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 lg:px-8">
             <PageIntro title="Glossaire" lede="Apprenez les mots clés" />
             {SECTIONS.map(({ language, label }) => {
@@ -196,7 +204,7 @@ export function Glossary() {
                       <LearningCard
                         key={entry.id}
                         project={entry}
-                        onOpen={setActiveId}
+                        onOpen={openEntry}
                         index={index}
                       />
                     ))}

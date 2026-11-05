@@ -243,7 +243,7 @@ export default function Sandbox({ project, onBack, onNext }) {
           </div>
           {panel === "subject" && <Subject subject={project.subject} />}
           <div className={panel === "glossary" ? "contents" : "hidden"}>
-            <Glossary />
+            <Glossary embedded />
           </div>
           {panel === "console" && renderPanel()}
         </section>

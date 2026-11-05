@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Sandbox from "./Sandbox";
 import MobileBlock from "../components/MobileBlock";
 import HeaderBar from "../components/HeaderBar";
@@ -11,14 +12,13 @@ import PageIntro from "../components/PageIntro";
 import Progress from "../components/Progress";
 import Select from "../components/Select";
 import { LanguageTile } from "../components/ProjectCard";
-import { useNavigate } from "react-router-dom";
 
 const LEARNING_STORAGE_KEY = "manta-active-learning";
 
 export function LearningPage() {
-  const [activeId, setActiveId] = useState(() =>
-    localStorage.getItem(LEARNING_STORAGE_KEY),
-  );
+  const { id: activeId } = useParams();
+  const navigate = useNavigate();
+  const openEntry = (id) => navigate(`/learning/${id}`);
   const active =
     learningProjects.find((project) => project.id === activeId) ?? null;
 
@@ -31,7 +31,6 @@ export function LearningPage() {
     return index >= 0 ? (sameLang[index + 1] ?? null) : null;
   })();
   const [completion, setCompletion] = useState("all");
-  let navigate = useNavigate();
 
   const matchesCompletion = (project) => {
     if (completion === "all") return true;
@@ -41,14 +40,6 @@ export function LearningPage() {
     if (completion === "yes") return mark === true;
     return true;
   };
-
-  useEffect(() => {
-    if (activeId) {
-      localStorage.setItem(LEARNING_STORAGE_KEY, activeId);
-    } else {
-      localStorage.removeItem(LEARNING_STORAGE_KEY);
-    }
-  }, [activeId]);
 
   const isProjetOk = (id) => isCompleted(id);
 
@@ -74,8 +65,9 @@ export function LearningPage() {
           <Sandbox
             key={active.id}
             project={active}
-            onBack={() => setActiveId(null)}
-            onNext={nextExercise ? () => setActiveId(nextExercise.id) : null}
+            onBack={() => navigate("/learning")}
+            onNext={nextExercise ? () => openEntry(nextExercise.id) : null}
+            PyodideProvider
           />
         ) : (
           <PatternPage>
@@ -121,7 +113,7 @@ export function LearningPage() {
                         <LearningCard
                           key={project.id}
                           project={project}
-                          onOpen={setActiveId}
+                          onOpen={openEntry}
                           ok={completionMark(project.id)}
                           index={track.indexOf(project)}
                         />

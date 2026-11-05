@@ -83,7 +83,7 @@ export const THEME_GROUPS = [
   { id: "festive", label: "Fêtes" },
 ];
 
-export const DEFAULT_THEME = "default";
+export const DEFAULT_THEME = "hiver";
 export const DEFAULT_MODE = "dark";
 
 export function themeFontHref(theme) {
