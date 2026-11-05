@@ -271,9 +271,6 @@ export function computeLocalStats() {
   };
 }
 
-// GET /api/stats répond un objet JSON dont chaque clé remplace celle de
-// computeLocalStats() ; `community` ({ rank, players, percentile }) vient
-// uniquement du back. Une réponse partielle est valide.
 export async function fetchStats() {
   try {
     const response = await fetch(`${API_URL}/api/stats`);
