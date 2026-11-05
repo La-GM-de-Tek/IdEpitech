@@ -9,8 +9,10 @@ import { useCLanguage, SAMPLE_C } from "../languages/c";
 import Hints from "../components/Hints";
 import Icon from "../components/Icon";
 import { completionMark } from "../completion";
+import { trackRun, trackTime } from "../activity";
 
 const STORAGE_KEY = "manta-code-";
+const TIME_TICK_SECONDS = 30;
 
 function buildHtmlDocument({ html, css, javascript }) {
   const styleTag = css ? `\n<style>\n${css}\n</style>` : "";
@@ -72,6 +74,13 @@ export default function Sandbox({ project, onBack, onNext }) {
     );
   }, [files]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!document.hidden) trackTime(project.id, TIME_TICK_SECONDS);
+    }, TIME_TICK_SECONDS * 1000);
+    return () => clearInterval(timer);
+  }, [project.id]);
+
   const onRequestPanel = useCallback(() => setRightPanel(true), []);
 
   const goNext = useCallback(() => {
@@ -107,10 +116,10 @@ export default function Sandbox({ project, onBack, onNext }) {
 
   const { status, version, execute, renderPanel } = active;
 
-  const handleRun = useCallback(
-    () => execute(isHtml ? buildHtmlDocument(files) : files[language]),
-    [execute, files, isHtml, language],
-  );
+  const handleRun = useCallback(() => {
+    if (status === "ready" || status === "running") trackRun(project.id);
+    return execute(isHtml ? buildHtmlDocument(files) : files[language]);
+  }, [execute, files, isHtml, language, project.id, status]);
 
   runRef.current = handleRun;
 
