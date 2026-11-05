@@ -64,6 +64,15 @@ export default function HeaderBar() {
       <div className="flex items-center gap-2 justify-self-end">
         <button
           type="button"
+          onClick={() => navigate("/stats")}
+          title="Statistiques"
+          aria-label="Statistiques"
+          className="btn btn-outline btn-icon"
+        >
+          <Icon name="chart" size={17} />
+        </button>
+        <button
+          type="button"
           onClick={() => navigate("/achievements")}
           title="Succès"
           aria-label="Succès"
