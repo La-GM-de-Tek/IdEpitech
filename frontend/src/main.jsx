@@ -8,6 +8,7 @@ import { LearningPage } from "./pages/LearningPage.jsx";
 import { Glossary } from "./pages/Glossary.jsx";
 import { Agenda } from "./pages/Agenda.jsx";
 import { ThemeProvider } from "./theme/ThemeContext.jsx";
+import { AuthProvider } from "./auth/AuthContext.jsx";
 import { applyThemeStyles } from "./theme/themes.jsx";
 import ThemeBackground from "./components/ThemeBackground.jsx";
 
@@ -16,37 +17,39 @@ applyThemeStyles();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
-      <ThemeBackground>
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <PyodideProvider>
-                  <App />
-                </PyodideProvider>
-              }
-            />
-            <Route
-              path="/learning"
-              element={
-                <PyodideProvider>
-                  <LearningPage />
-                </PyodideProvider>
-              }
-            />
-            <Route
-              path="/glossary"
-              element={
-                <PyodideProvider>
-                  <Glossary />
-                </PyodideProvider>
-              }
-            />
-            <Route path="/agenda" element={<Agenda />} />
-          </Routes>
-        </BrowserRouter>
-      </ThemeBackground>
+      <AuthProvider>
+        <ThemeBackground>
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <PyodideProvider>
+                    <App />
+                  </PyodideProvider>
+                }
+              />
+              <Route
+                path="/learning"
+                element={
+                  <PyodideProvider>
+                    <LearningPage />
+                  </PyodideProvider>
+                }
+              />
+              <Route
+                path="/glossary"
+                element={
+                  <PyodideProvider>
+                    <Glossary />
+                  </PyodideProvider>
+                }
+              />
+              <Route path="/agenda" element={<Agenda />} />
+            </Routes>
+          </BrowserRouter>
+        </ThemeBackground>
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>,
 );

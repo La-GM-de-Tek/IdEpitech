@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../theme/ThemeContext";
 import SettingsButton from "./SettingsButton";
+import AccountButton from "./AccountButton";
 import EpitechLogoWhite from "../assets/epitech-eu_BIG.D.svg";
 import EpitechLogoBlue from "../assets/epitech-eu_BIG.svg";
 
@@ -52,7 +53,10 @@ export default function HeaderBar() {
         </a>
       )}
 
-      <SettingsButton />
+      <div className="flex items-center gap-2">
+        <AccountButton />
+        <SettingsButton />
+      </div>
     </header>
   );
 }
