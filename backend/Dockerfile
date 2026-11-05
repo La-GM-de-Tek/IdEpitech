@@ -1,13 +1,19 @@
-FROM golang:1.27
+FROM golang:1.27 AS build
 
-WORKDIR /app
+WORKDIR /src
 
 COPY go.mod go.sum ./
-
 RUN go mod download
 
-COPY *.go ./
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/backend .
 
-RUN go build -v -o /app/backend main.go
+FROM alpine:3.22
 
-CMD ["app"]
+RUN adduser -D -u 10001 app
+USER app
+
+COPY --from=build /out/backend /usr/local/bin/backend
+
+EXPOSE 8080
+CMD ["backend"]
