@@ -65,10 +65,8 @@ export default function Toolbar({
         type: "text/plain",
       });
     if (window.navigator.msSaveOrOpenBlob)
-      // IE10+
       window.navigator.msSaveOrOpenBlob(file, filename);
     else {
-      // Others
       var url = URL.createObjectURL(file);
       a.href = url;
       a.download = filename;
