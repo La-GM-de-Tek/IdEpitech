@@ -1,5 +1,7 @@
 # API IDEpitech
 
+<!-- TODO a remplacer par le vrai swagger -->
+
 ## 1. Conventions
 
 | Élément          | Valeur                                                                      |
