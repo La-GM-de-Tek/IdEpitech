@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../theme/ThemeContext";
 import SettingsButton from "./SettingsButton";
+import AccountButton from "./AccountButton";
 import Icon from "./Icon";
 import EpitechLogoWhite from "../assets/epitech-eu_BIG.D.svg";
 import EpitechLogoBlue from "../assets/epitech-eu_BIG.svg";
@@ -77,6 +78,7 @@ export default function HeaderBar({ showAchievements = true }) {
             <Icon name="trophy" size={17} />
           </button>
         )}
+        <AccountButton />
         <SettingsButton />
       </div>
 

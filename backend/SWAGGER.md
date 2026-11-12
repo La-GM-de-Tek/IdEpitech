@@ -1,10 +1,12 @@
 # API IDEpitech
 
+<!-- TODO a remplacer par le vrai swagger -->
+
 ## 1. Conventions
 
 | Élément          | Valeur                                                                      |
 | ---------------- | --------------------------------------------------------------------------- |
-| Base URL         | `/api/v1`                                                                   |
+| Base URL         | `/api`                                                                      |
 | Format           | JSON (`Content-Type: application/json`), UTF-8                              |
 | Dates            | ISO 8601 (`2026-11-05T14:30:00Z`), `YYYY-MM-DD` pour les champs `DATE` purs |
 | Authentification | JWT dans l'en-tête `Authorization: Bearer <jwt>`                            |
@@ -72,6 +74,7 @@ Niveaux d'accès utilisés dans ce document :
 | 415  | `UNSUPPORTED_MEDIA` | Type de fichier refusé (PDF attendu)            |
 | 429  | `TOO_MANY_REQUESTS` | Rate limit (login, redeem de token)             |
 | 500  | `INTERNAL_ERROR`    | Erreur serveur                                  |
+| 501  | `NOT_IMPLEMENTED`   | Route déclarée mais pas encore codée            |
 | 502  | `SHEET_UNREACHABLE` | Service externe (Google Sheet) injoignable      |
 
 ### 2.3 Objets
@@ -104,11 +107,11 @@ Le mot de passe n'est **jamais** renvoyé.
   "id": 3,
   "slug": "fil-ariane",
   "name": "Fil d'Ariane",
-  "langage": "python",
+  "langage": 1,
   "description": "Guidez Thésée hors du labyrinthe en déroulant le fil.",
   "difficulty": 2,
-  "pdf_url": "/api/v1/subjects/3/pdf",
-  "component": "fil-ariane",
+  "pdf_url": "/api/subjects/3/pdf",
+  "component_path": "fil-ariane",
   "published": true,
   "steps_count": 3,
   "steps": [{ "...": "Step" }],
@@ -161,20 +164,23 @@ Pour un non-admin, `expected` est remplacé par `"has_expected": true` ou `false
 }
 ```
 
-**Token**
+**Language**
 
 ```json
-{ "id": 7, "token": 482913, "subject": 3, "theme": null }
+{ "id": 1, "name": "python" }
 ```
 
-**Planning**
+**Session** (`token` n'est renvoyé qu'aux admins)
 
 ```json
 {
   "id": 5,
   "nom": "Coding Club - Découverte Python",
   "date": "2026-07-29",
-  "campus": "Lyon"
+  "campus": "Lyon",
+  "subject": 3,
+  "theme": null,
+  "token": 482913
 }
 ```
 
@@ -191,7 +197,7 @@ Pour un non-admin, `expected` est remplacé par `"has_expected": true` ou `false
     "id": 3,
     "slug": "fil-ariane",
     "name": "Fil d'Ariane",
-    "langage": "python"
+    "langage": 1
   }
 }
 ```
@@ -209,7 +215,7 @@ Pour un non-admin, `expected` est remplacé par `"has_expected": true` ou `false
     "id": 3,
     "slug": "fil-ariane",
     "name": "Fil d'Ariane",
-    "langage": "python"
+    "langage": 1
   },
   "steps": [
     { "id": 11, "position": 1, "is_bonus": false, "passed_at": "2026-10-20" },
@@ -309,7 +315,7 @@ Tous les champs sont optionnels, au moins un est requis.
 
 ### `DELETE /users/me` - 🔒 User
 
-Supprime le compte et ses lignes dans `SubjectToUser`, `SuccessToUser` et `ThemeToUser` (cascade).
+Supprime le compte et ses lignes dans `SubjectToUser`, `StepToUser`, `SuccessToUser`, `ThemeToUser` et `SessionToUser` (cascade).
 
 | Paramètre  | Où   | Type   | Requis | Description              |
 | ---------- | ---- | ------ | :----: | ------------------------ |
@@ -367,7 +373,7 @@ Un visiteur ne voit que les sujets publiés. Un admin voit tout et peut filtrer 
 
 | Paramètre    | Où    | Type    | Requis | Description                                                  |
 | ------------ | ----- | ------- | :----: | ------------------------------------------------------------ |
-| `langage`    | query | string  |   ❌   | `python` ou `c` ou `html`                                    |
+| `langage`    | query | integer |   ❌   | `id` d'un `Language`                                         |
 | `difficulty` | query | integer |   ❌   | `0` à `3`                                                    |
 | `search`     | query | string  |   ❌   | Filtre sur `name` et `description`                           |
 | `published`  | query | boolean |   ❌   | Admin uniquement                                             |
@@ -390,20 +396,20 @@ Un visiteur ne voit que les sujets publiés. Un admin voit tout et peut filtrer 
 
 Crée le sujet, éventuellement avec ses étapes en une seule requête.
 
-| Paramètre     | Où   | Type    | Requis | Description                                                           |
-| ------------- | ---- | ------- | :----: | --------------------------------------------------------------------- |
-| `name`        | body | string  |   ✅   | Nom affiché (`Fil d'Ariane`)                                          |
-| `slug`        | body | string  |   ❌   | Unique, généré depuis `name` si absent                                |
-| `langage`     | body | string  |   ✅   | `python` ou `c` ou `html`                                             |
-| `description` | body | string  |   ❌   |                                                                       |
-| `difficulty`  | body | integer |   ✅   | `0` à `3`                                                             |
-| `component`   | body | string  |   ❌   | Clé d'un visualiseur existant du front                                |
-| `published`   | body | boolean |   ❌   | Défaut `false`                                                        |
-| `steps`       | body | array   |   ❌   | Liste de `Step` sans `id` ni `position` (l'ordre du tableau fait foi) |
+| Paramètre        | Où   | Type    | Requis | Description                                                           |
+| ---------------- | ---- | ------- | :----: | --------------------------------------------------------------------- |
+| `name`           | body | string  |   ✅   | Nom affiché (`Fil d'Ariane`)                                          |
+| `slug`           | body | string  |   ❌   | Unique, généré depuis `name` si absent                                |
+| `langage`        | body | integer |   ✅   | `id` d'un `Language`                                                  |
+| `description`    | body | string  |   ❌   |                                                                       |
+| `difficulty`     | body | integer |   ✅   | `0` à `3`                                                             |
+| `component_path` | body | string  |   ❌   | Clé d'un visualiseur existant du front                                |
+| `published`      | body | boolean |   ❌   | Défaut `false`                                                        |
+| `steps`          | body | array   |   ❌   | Liste de `Step` sans `id` ni `position` (l'ordre du tableau fait foi) |
 
 Le PDF s'envoie ensuite avec `PUT /subjects/{id}/pdf`.
 
-**201** : `Subject`. Erreurs : `400` (langage, difficulté ou `component` inconnus), `409` (`slug` déjà pris).
+**201** : `Subject`. Erreurs : `400` (langage, difficulté ou `component_path` inconnus), `409` (`slug` déjà pris).
 
 #### `PATCH /subjects/{id}` - 🛡️ Admin
 
@@ -413,7 +419,7 @@ Mêmes champs que `POST` sauf `steps`, tous optionnels.
 
 #### `DELETE /subjects/{id}` - 🛡️ Admin
 
-Supprime le sujet, son PDF, ses étapes, les lignes `SubjectToUser` / `StepToUser` liées, et met à `NULL` les `Token.subject` qui pointent dessus. **204**. Erreurs : `404`.
+Supprime le sujet, son PDF, ses étapes, les lignes `SubjectToUser` / `StepToUser` liées et les `Session` de ce sujet. **204**. Erreurs : `404`.
 
 ### 5.2 PDF du sujet
 
@@ -435,7 +441,7 @@ Envoie ou remplace le PDF. Corps en `multipart/form-data`.
 
 ```json
 {
-  "pdf_url": "/api/v1/subjects/3/pdf",
+  "pdf_url": "/api/subjects/3/pdf",
   "size": 284512,
   "updated_at": "2026-11-05"
 }
@@ -494,13 +500,13 @@ Supprime l'étape et ses `StepToUser`, renumérote les suivantes et recalcule `c
 
 Sujets commencés par l'utilisateur connecté.
 
-| Paramètre   | Où    | Type    | Requis | Description                    |
-| ----------- | ----- | ------- | :----: | ------------------------------ |
-| `completed` | query | boolean |   ❌   | Terminés ou en cours           |
-| `bonus`     | query | boolean |   ❌   | Bonus obtenu ou non            |
-| `langage`   | query | string  |   ❌   | Filtre sur le langage du sujet |
-| `page`      | query | integer |   ❌   |                                |
-| `limit`     | query | integer |   ❌   |                                |
+| Paramètre   | Où    | Type    | Requis | Description              |
+| ----------- | ----- | ------- | :----: | ------------------------ |
+| `completed` | query | boolean |   ❌   | Terminés ou en cours     |
+| `bonus`     | query | boolean |   ❌   | Bonus obtenu ou non      |
+| `langage`   | query | integer |   ❌   | `id` du langage du sujet |
+| `page`      | query | integer |   ❌   |                          |
+| `limit`     | query | integer |   ❌   |                          |
 
 **200** : liste paginée de `UserSubject`.
 
@@ -666,7 +672,7 @@ Succès publics d'un autre utilisateur. **200** : liste paginée de `UserSuccess
 
 ### `DELETE /themes/{id}` - 🛡️ Admin
 
-Supprime aussi les lignes `ThemeToUser` et met à `NULL` les `Token.theme` qui pointent dessus. **204**. Erreurs : `404`.
+Supprime aussi les lignes `ThemeToUser` et met à `NULL` les `Session.theme` qui pointent dessus. **204**. Erreurs : `404`.
 
 ### `GET /users/me/themes` - 🔒 User
 
@@ -674,7 +680,7 @@ Thèmes débloqués par l'utilisateur. **200** : liste de `UserTheme` (non pagin
 
 ### `POST /users/{id}/themes` - 🛡️ Admin
 
-Donne un thème à un utilisateur sans passer par un token.
+Donne un thème à un utilisateur sans passer par une session.
 
 | Paramètre  | Où   | Type    | Requis | Description |
 | ---------- | ---- | ------- | :----: | ----------- |
@@ -689,9 +695,103 @@ Donne un thème à un utilisateur sans passer par un token.
 
 ---
 
-## 8. Tokens (codes de déblocage)
+## 8. Languages
 
-### `POST /tokens/redeem` - 🔒 User
+### `GET /languages` - Public
+
+**200** : liste de `Language` (non paginée).
+
+### `GET /languages/{id}` - Public
+
+**200** : `Language`. Erreurs : `404`.
+
+### `POST /languages` - 🛡️ Admin
+
+| Paramètre | Où   | Type   | Requis | Description          |
+| --------- | ---- | ------ | :----: | -------------------- |
+| `name`    | body | string |   ✅   | Unique (`python`...) |
+
+**201** : `Language`. Erreurs : `400`, `409`.
+
+### `PATCH /languages/{id}` - 🛡️ Admin
+
+| Paramètre | Où   | Type   | Requis | Description |
+| --------- | ---- | ------ | :----: | ----------- |
+| `name`    | body | string |   ✅   | Unique      |
+
+**200** : `Language`. Erreurs : `400`, `404`, `409`.
+
+### `DELETE /languages/{id}` - 🛡️ Admin
+
+**204**. Erreurs : `404`, `409` (des sujets utilisent encore ce langage).
+
+---
+
+## 9. Sessions
+
+Une `Session` est un événement (Coding Club, Portes Ouvertes...) daté, sur un campus, lié à un sujet et éventuellement à un thème. Son `token` est le code donné aux participants : le saisir les inscrit à la session et débloque le sujet et le thème.
+
+### `GET /sessions` - Public
+
+| Paramètre | Où    | Type    | Requis | Description                                    |
+| --------- | ----- | ------- | :----: | ---------------------------------------------- |
+| `campus`  | query | string  |   ❌   | Ex. `Lyon` (voir la liste `CAMPUSES` du front) |
+| `from`    | query | date    |   ❌   | `YYYY-MM-DD`, inclus. Défaut : aujourd'hui     |
+| `to`      | query | date    |   ❌   | `YYYY-MM-DD`, inclus                           |
+| `subject` | query | integer |   ❌   | Sessions de ce sujet                           |
+| `theme`   | query | integer |   ❌   | Sessions qui débloquent ce thème               |
+| `page`    | query | integer |   ❌   |                                                |
+| `limit`   | query | integer |   ❌   | Défaut `50`, max `200`                         |
+
+**200** : liste paginée de `Session` (sans `token`), triée par `date` croissante.
+
+### `GET /sessions/campuses` - Public
+
+Liste des campus qui ont au moins une session à venir.
+
+**200**
+
+```json
+{ "data": ["Bordeaux", "Lyon", "Paris"] }
+```
+
+### `GET /sessions/{id}` - Public
+
+**200** : `Session` (sans `token` pour un non-admin). Erreurs : `404`.
+
+### `POST /sessions` - 🛡️ Admin
+
+| Paramètre | Où   | Type    | Requis | Description                                  |
+| --------- | ---- | ------- | :----: | -------------------------------------------- |
+| `nom`     | body | string  |   ✅   |                                              |
+| `date`    | body | date    |   ✅   | `YYYY-MM-DD`                                 |
+| `campus`  | body | string  |   ✅   |                                              |
+| `subject` | body | integer |   ✅   | Sujet débloqué                               |
+| `theme`   | body | integer |   ❌   | Thème débloqué                               |
+| `token`   | body | integer |   ❌   | Code imposé ; généré aléatoirement si absent |
+
+**201** : `Session`. Erreurs : `400`, `404` (sujet ou thème inconnu), `409` (code déjà existant).
+
+### `PATCH /sessions/{id}` - 🛡️ Admin
+
+Mêmes champs que `POST`, tous optionnels. **200** : `Session`. Erreurs : `400`, `404`, `409`.
+
+### `DELETE /sessions/{id}` - 🛡️ Admin
+
+Supprime aussi les lignes `SessionToUser`. **204**. Erreurs : `404`.
+
+### `GET /sessions/{id}/users` - 🛡️ Admin
+
+Participants de la session.
+
+| Paramètre | Où    | Type    | Requis |
+| --------- | ----- | ------- | :----: |
+| `page`    | query | integer |   ❌   |
+| `limit`   | query | integer |   ❌   |
+
+**200** : liste paginée de `PublicUser`. Erreurs : `404`.
+
+### `POST /sessions/redeem` - 🔒 User
 
 | Paramètre | Où   | Type    | Requis | Description       |
 | --------- | ---- | ------- | :----: | ----------------- |
@@ -699,21 +799,22 @@ Donne un thème à un utilisateur sans passer par un token.
 
 Effets :
 
-- si `Token.subject` est défini : crée la ligne `SubjectToUser` (`completed = false`, `bonus = false`) si elle n'existe pas ;
-- si `Token.theme` est défini : insertion dans `ThemeToUser` (ignorée si déjà présent) ;
-- `User.session` ← `Token.id`.
+- insertion dans `SessionToUser` (ignorée si déjà présent) ;
+- crée la ligne `SubjectToUser` du sujet (`completed = false`, `bonus = false`) si elle n'existe pas ;
+- si `Session.theme` est défini : insertion dans `ThemeToUser` (ignorée si déjà présent) ;
+- `User.session` ← `Session.id`.
 
 **200**
 
 ```json
 {
-  "token": { "id": 7, "token": 482913 },
+  "session": { "id": 5, "nom": "Coding Club - Découverte Python" },
   "unlocked": {
     "subject": {
       "id": 3,
       "slug": "fil-ariane",
       "name": "Fil d'Ariane",
-      "langage": "python"
+      "langage": 1
     },
     "theme": null
   }
@@ -722,104 +823,17 @@ Effets :
 
 Erreurs : `400`, `404` (code inconnu), `429` (rate limit : 10 essais / minute / utilisateur, pour empêcher le brute-force des codes).
 
-### `GET /tokens` - 🛡️ Admin
+### `GET /users/me/sessions` - 🔒 User
 
-| Paramètre | Où    | Type    | Requis | Description            |
-| --------- | ----- | ------- | :----: | ---------------------- |
-| `subject` | query | integer |   ❌   | Tokens liés à ce sujet |
-| `theme`   | query | integer |   ❌   | Tokens liés à ce thème |
-| `page`    | query | integer |   ❌   |                        |
-| `limit`   | query | integer |   ❌   |                        |
+Sessions suivies par l'utilisateur connecté. **200** : liste paginée de `Session` (sans `token`).
 
-**200** : liste paginée de `Token`.
+### `GET /users/{id}/sessions` - 🛡️ Admin
 
-### `GET /tokens/{id}` - 🛡️ Admin
-
-**200** : `Token`, avec en plus `"users_count"` (nombre d'utilisateurs dont `session` pointe dessus). Erreurs : `404`.
-
-### `POST /tokens` - 🛡️ Admin
-
-Au moins un des deux champs `subject` / `theme` est requis.
-
-| Paramètre | Où   | Type    | Requis | Description                                  |
-| --------- | ---- | ------- | :----: | -------------------------------------------- |
-| `token`   | body | integer |   ❌   | Code imposé ; généré aléatoirement si absent |
-| `subject` | body | integer |   ❌   | Sujet à débloquer                            |
-| `theme`   | body | integer |   ❌   | Thème à débloquer                            |
-
-**201** : `Token`. Erreurs : `400`, `404` (sujet ou thème inconnu), `409` (code déjà existant).
-
-### `PATCH /tokens/{id}` - 🛡️ Admin
-
-Mêmes champs que `POST`, tous optionnels. **200** : `Token`. Erreurs : `400`, `404`, `409`.
-
-### `DELETE /tokens/{id}` - 🛡️ Admin
-
-Met à `NULL` le `session` des utilisateurs qui pointent dessus. **204**. Erreurs : `404`.
+Même réponse que `GET /users/me/sessions`, pour n'importe quel utilisateur.
 
 ---
 
-## 9. Planning (agenda)
-
-### `GET /plannings` - Public
-
-| Paramètre | Où    | Type    | Requis | Description                                    |
-| --------- | ----- | ------- | :----: | ---------------------------------------------- |
-| `campus`  | query | string  |   ❌   | Ex. `Lyon` (voir la liste `CAMPUSES` du front) |
-| `from`    | query | date    |   ❌   | `YYYY-MM-DD`, inclus. Défaut : aujourd'hui     |
-| `to`      | query | date    |   ❌   | `YYYY-MM-DD`, inclus                           |
-| `page`    | query | integer |   ❌   |                                                |
-| `limit`   | query | integer |   ❌   | Défaut `50`, max `200`                         |
-
-**200** : liste paginée de `Planning`, triée par `date` croissante.
-
-### `GET /plannings/campuses` - Public
-
-Liste des campus qui ont au moins un événement à venir.
-
-**200**
-
-```json
-{ "data": ["Bordeaux", "Lyon", "Paris"] }
-```
-
-### `GET /plannings/{id}` - Public
-
-**200** : `Planning`. Erreurs : `404`.
-
-### `POST /plannings` - 🛡️ Admin
-
-| Paramètre | Où   | Type   | Requis | Description  |
-| --------- | ---- | ------ | :----: | ------------ |
-| `nom`     | body | string |   ✅   |              |
-| `date`    | body | date   |   ✅   | `YYYY-MM-DD` |
-| `campus`  | body | string |   ✅   |              |
-
-**201** : `Planning`. Erreurs : `400`.
-
-### `PATCH /plannings/{id}` - 🛡️ Admin
-
-Mêmes champs que `POST`, tous optionnels. **200** : `Planning`. Erreurs : `400`, `404`.
-
-### `DELETE /plannings/{id}` - 🛡️ Admin
-
-**204**. Erreurs : `404`.
-
-### `POST /plannings/sync` - 🛡️ Admin
-
-Lance tout de suite le cron `sync-planning` sans attendre sa prochaine exécution.
-
-Aucun paramètre. **200**
-
-```json
-{ "created": 3, "updated": 1, "deleted": 0, "duration_ms": 412 }
-```
-
-Erreurs : `502` (`SHEET_UNREACHABLE`, Google Sheet injoignable).
-
----
-
-## 12. Récapitulatif des routes
+## 10. Récapitulatif des routes
 
 | Méthode | Route                                                      | Accès    |
 | ------- | ---------------------------------------------------------- | -------- |
@@ -870,16 +884,18 @@ Erreurs : `502` (`SHEET_UNREACHABLE`, Google Sheet injoignable).
 | GET     | `/users/me/themes`                                         | 🔒 User  |
 | POST    | `/users/{id}/themes`                                       | 🛡️ Admin |
 | DELETE  | `/users/{id}/themes/{theme_id}`                            | 🛡️ Admin |
-| POST    | `/tokens/redeem`                                           | 🔒 User  |
-| GET     | `/tokens`                                                  | 🛡️ Admin |
-| GET     | `/tokens/{id}`                                             | 🛡️ Admin |
-| POST    | `/tokens`                                                  | 🛡️ Admin |
-| PATCH   | `/tokens/{id}`                                             | 🛡️ Admin |
-| DELETE  | `/tokens/{id}`                                             | 🛡️ Admin |
-| GET     | `/plannings`                                               | Public   |
-| GET     | `/plannings/campuses`                                      | Public   |
-| GET     | `/plannings/{id}`                                          | Public   |
-| POST    | `/plannings`                                               | 🛡️ Admin |
-| PATCH   | `/plannings/{id}`                                          | 🛡️ Admin |
-| DELETE  | `/plannings/{id}`                                          | 🛡️ Admin |
-| POST    | `/plannings/sync`                                          | 🛡️ Admin |
+| GET     | `/languages`                                               | Public   |
+| GET     | `/languages/{id}`                                          | Public   |
+| POST    | `/languages`                                               | 🛡️ Admin |
+| PATCH   | `/languages/{id}`                                          | 🛡️ Admin |
+| DELETE  | `/languages/{id}`                                          | 🛡️ Admin |
+| GET     | `/sessions`                                                | Public   |
+| GET     | `/sessions/campuses`                                       | Public   |
+| GET     | `/sessions/{id}`                                           | Public   |
+| POST    | `/sessions`                                                | 🛡️ Admin |
+| PATCH   | `/sessions/{id}`                                           | 🛡️ Admin |
+| DELETE  | `/sessions/{id}`                                           | 🛡️ Admin |
+| GET     | `/sessions/{id}/users`                                     | 🛡️ Admin |
+| POST    | `/sessions/redeem`                                         | 🔒 User  |
+| GET     | `/users/me/sessions`                                       | 🔒 User  |
+| GET     | `/users/{id}/sessions`                                     | 🛡️ Admin |
