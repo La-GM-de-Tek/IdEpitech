@@ -1,9 +1,70 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTheme } from "../theme/ThemeContext";
+import { THEME_GROUPS, loadThemeFont } from "../theme/themes";
+import Icon from "./Icon";
+
+function fontFamily(theme) {
+  return theme.font
+    ? `"${theme.font.split(":")[0].replaceAll("+", " ")}", var(--font-sans)`
+    : "var(--font-sans)";
+}
+
+function ThemeSwatch({ theme, mode, selected, onSelect }) {
+  const palette = theme.colors[mode];
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onSelect}
+      className={`group flex flex-col overflow-hidden rounded-2xl border text-left transition ${
+        selected
+          ? "border-[var(--accent)] shadow-[0_0_0_3px_color-mix(in_oklab,var(--accent)_25%,transparent)]"
+          : "border-[var(--border)] hover:border-[var(--border-strong)]"
+      }`}
+    >
+      <span
+        className="relative flex h-16 items-end justify-between px-3 pb-2"
+        style={{
+          background: `radial-gradient(90% 90% at 85% 0%, ${palette.accent}55, transparent 60%), linear-gradient(160deg, ${palette.surface}, ${palette.bg})`,
+        }}
+      >
+        <span className="text-2xl leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110">
+          {theme.logo}
+        </span>
+        <span className="flex gap-1" aria-hidden="true">
+          {[palette.accent, palette.accent2 ?? palette.accent, palette.text].map(
+            (color, i) => (
+              <span
+                key={i}
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: color, boxShadow: `0 0 0 1.5px ${palette.bg}` }}
+              />
+            ),
+          )}
+        </span>
+        {selected && (
+          <span className="absolute top-2 right-2 grid h-5 w-5 place-items-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)]">
+            <Icon name="check" size={12} strokeWidth={3} />
+          </span>
+        )}
+      </span>
+      <span
+        className="truncate bg-[var(--surface)] px-3 py-2 text-[0.9375rem] text-[var(--text)]"
+        style={{ fontFamily: fontFamily(theme) }}
+      >
+        {theme.label}
+      </span>
+    </button>
+  );
+}
 
 function SettingsModal({ onClose }) {
   const { themeId, setThemeId, themes, mode, setMode } = useTheme();
+
+  useEffect(() => {
+    Object.values(themes).forEach(loadThemeFont);
+  }, [themes]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -15,81 +76,79 @@ function SettingsModal({ onClose }) {
   }, [onClose]);
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onPointerDown={onClose}
-    >
+    <div className="overlay" onPointerDown={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Paramètres"
         onPointerDown={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-2xl"
+        className="dialog thin-scroll max-h-[calc(100dvh-2rem)] max-w-2xl overflow-y-auto p-5 sm:p-6"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[var(--text)]">
+          <h2 className="text-base font-bold text-[var(--text)]">
             Paramètres
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Fermer"
-            className="rounded-md px-2 py-1 text-sm text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+            className="btn btn-ghost btn-sm btn-icon"
           >
-            ✕
+            <Icon name="x" size={16} />
           </button>
         </div>
 
         <div className="mt-5">
-          <p className="text-xs font-medium text-[var(--text-muted)]">
+          <p className="text-xs font-semibold text-[var(--text-muted)]">
             Apparence
           </p>
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 grid max-w-xs grid-cols-2 gap-1 rounded-xl bg-[var(--bg)] p-1 shadow-[inset_0_0_0_1px_var(--border)]">
             {[
-              { id: "light", logo: "☀️", label: "Clair" },
-              { id: "dark", logo: "🌙", label: "Sombre" },
+              { id: "light", icon: "sun", label: "Clair" },
+              { id: "dark", icon: "moon", label: "Sombre" },
             ].map((option) => (
               <button
                 key={option.id}
                 type="button"
                 aria-pressed={option.id === mode}
                 onClick={() => setMode(option.id)}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-xs font-medium transition ${
+                className={`flex h-8 items-center justify-center gap-2 rounded-[0.6rem] text-[0.8125rem] font-semibold transition ${
                   option.id === mode
-                    ? "border-[var(--accent)] text-[var(--accent)]"
-                    : "border-[var(--border)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+                    ? "bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-sm),inset_0_0_0_1px_var(--border-strong)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text)]"
                 }`}
               >
-                <span className="text-sm">{option.logo}</span>
+                <Icon
+                  name={option.icon}
+                  size={15}
+                  className={option.id === mode ? "text-[var(--accent)]" : ""}
+                />
                 {option.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="mt-5">
-          <p className="text-xs font-medium text-[var(--text-muted)]">Thème</p>
-          <ul className="mt-2 space-y-1">
-            {Object.values(themes).map((theme) => (
-              <li key={theme.id}>
-                <button
-                  type="button"
-                  aria-pressed={theme.id === themeId}
-                  onClick={() => setThemeId(theme.id)}
-                  className={`flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left text-xs transition hover:bg-[var(--surface-hover)] ${
-                    theme.id === themeId
-                      ? "text-[var(--accent)]"
-                      : "text-[var(--text-muted)] hover:text-[var(--text)]"
-                  }`}
-                >
-                  <span className="text-sm">{theme.logo}</span>
-                  {theme.label}
-                  {theme.id === themeId && <span className="ml-auto">✓</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {THEME_GROUPS.map((group) => (
+          <div key={group.id} className="mt-6">
+            <p className="text-xs font-semibold text-[var(--text-muted)]">
+              {group.label}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+              {Object.values(themes)
+                .filter((theme) => theme.group === group.id)
+                .map((theme) => (
+                  <ThemeSwatch
+                    key={theme.id}
+                    theme={theme}
+                    mode={mode}
+                    selected={theme.id === themeId}
+                    onSelect={() => setThemeId(theme.id)}
+                  />
+                ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>,
     document.body,
@@ -106,9 +165,13 @@ export default function SettingsButton() {
         onClick={() => setOpen(true)}
         title="Paramètres"
         aria-label="Paramètres"
-        className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-sm text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+        className="btn btn-outline btn-icon group"
       >
-        ⚙️
+        <Icon
+          name="settings"
+          size={17}
+          className="transition-transform duration-500 group-hover:rotate-90"
+        />
       </button>
 
       {open && <SettingsModal onClose={() => setOpen(false)} />}

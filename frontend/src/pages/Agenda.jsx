@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import HeaderBar from "../components/HeaderBar";
 import PatternPage from "../components/PatternPage";
+import PageIntro from "../components/PageIntro";
+import Select from "../components/Select";
+import Icon from "../components/Icon";
 import { CAMPUSES, EVENT_TYPES, fetchEvents } from "../datas/events";
 
 const WEEKDAYS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-
-const SELECT_CLASS =
-  "rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-muted)] outline-none transition hover:border-emerald-500/50 hover:bg-[var(--surface-hover)]";
 
 function typeInfo(type) {
   return (
     EVENT_TYPES[type] ?? {
       label: type,
-      badge: "bg-[var(--surface-hover)] text-[var(--text-muted)]",
+      color: "var(--text-faint)",
     }
   );
 }
@@ -87,6 +87,7 @@ export function Agenda() {
     ...Array.from({ length: offset }, () => null),
     ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
   ];
+  while (cells.length % 7 !== 0) cells.push(null);
 
   const todayKey = dayKey(new Date());
 
@@ -101,71 +102,87 @@ export function Agenda() {
   return (
     <PatternPage>
       <HeaderBar />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
-            Agenda
-          </h2>
-          <div className="flex gap-2">
-            <select
-              value={campus}
-              onChange={(e) => setCampus(e.target.value)}
-              className={SELECT_CLASS}
-            >
-              <option value="all">Tous les campus</option>
-              {CAMPUSES.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className={SELECT_CLASS}
-            >
-              <option value="all">Tous les types</option>
-              {Object.entries(EVENT_TYPES).map(([id, eventType]) => (
-                <option key={id} value={id}>
-                  {eventType.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+      <main className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 lg:px-8">
+        <PageIntro title="Agenda" lede="Les prochains événements">
+          <Select
+            aria-label="Campus"
+            value={campus}
+            onChange={(e) => setCampus(e.target.value)}
+          >
+            <option value="all">Tous les campus</option>
+            {CAMPUSES.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </Select>
+          <Select
+            aria-label="Type d'événement"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+          >
+            <option value="all">Tous les types</option>
+            {Object.entries(EVENT_TYPES).map(([id, eventType]) => (
+              <option key={id} value={id}>
+                {eventType.label}
+              </option>
+            ))}
+          </Select>
+        </PageIntro>
 
-        <div className="mb-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-xs text-[var(--text-muted)]">
+        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]">
+          <span
+            className="tile"
+            style={nextEvent ? undefined : { "--tone": "var(--text-faint)" }}
+            aria-hidden="true"
+          >
+            <Icon name="calendar" size={20} />
+          </span>
           {loading ? (
-            "Chargement des événements…"
+            <p className="text-sm text-[var(--text-muted)]">
+              Chargement des événements…
+            </p>
           ) : nextEvent ? (
-            <>
-              <span className="font-semibold text-[var(--text)]">
-                Prochain événement :
-              </span>{" "}
-              {nextEvent.title} — {nextEvent.campus},{" "}
-              {new Date(nextEvent.date).toLocaleDateString("fr-FR", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </>
+            <button
+              type="button"
+              onClick={() => setSelected(nextEvent)}
+              className="group min-w-0 flex-1 text-left"
+            >
+              <span className="block text-xs font-semibold text-[var(--text-faint)]">
+                Prochain événement
+              </span>
+              <span className="mt-0.5 block truncate text-[0.9375rem] font-bold text-[var(--text)] group-hover:underline group-hover:underline-offset-4">
+                {nextEvent.title}
+              </span>
+              <span className="mt-0.5 block text-[0.8125rem] text-[var(--text-muted)] first-letter:uppercase">
+                {nextEvent.campus} ·{" "}
+                {new Date(nextEvent.date).toLocaleDateString("fr-FR", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </button>
           ) : (
-            "Aucun événement à venir pour ces filtres."
+            <p className="text-sm text-[var(--text-muted)]">
+              Aucun événement à venir pour ces filtres.
+            </p>
           )}
         </div>
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)]">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-3">
             <button
               type="button"
               onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}
-              className="rounded-md px-2 py-1 text-xs text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+              className="btn btn-ghost btn-sm"
             >
-              ← Mois précédent
+              <Icon name="chevronLeft" size={15} />
+              Mois précédent
             </button>
-            <span className="text-sm font-semibold capitalize text-[var(--text)]">
+            <span className="text-base font-bold capitalize text-[var(--text)]">
               {month.toLocaleDateString("fr-FR", {
                 month: "long",
                 year: "numeric",
@@ -174,21 +191,35 @@ export function Agenda() {
             <button
               type="button"
               onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}
-              className="rounded-md px-2 py-1 text-xs text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+              className="btn btn-ghost btn-sm"
             >
-              Mois suivant →
+              Mois suivant
+              <Icon name="chevronRight" size={15} />
             </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+          <div className="grid grid-cols-7 border-b border-[var(--border)] text-center text-[0.6875rem] font-bold tracking-[0.08em] text-[var(--text-faint)] uppercase">
             {WEEKDAYS.map((weekday) => (
-              <span key={weekday}>{weekday}</span>
+              <span key={weekday} className="py-2">
+                {weekday}
+              </span>
             ))}
           </div>
 
-          <div className="mt-1 grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-px bg-[var(--border)]">
             {cells.map((day, index) => {
-              if (day === null) return <div key={`empty-${index}`} />;
+              const weekend = index % 7 >= 5;
+              const cellBg = weekend
+                ? "bg-[color-mix(in_oklab,var(--surface)_70%,var(--bg))]"
+                : "bg-[var(--surface)]";
+
+              if (day === null)
+                return (
+                  <div
+                    key={`empty-${index}`}
+                    className="bg-[color-mix(in_oklab,var(--surface)_40%,var(--bg))]"
+                  />
+                );
 
               const key = dayKey(new Date(year, monthIndex, day));
               const dayEvents = byDay[key] ?? [];
@@ -197,17 +228,17 @@ export function Agenda() {
               return (
                 <div
                   key={key}
-                  className={`min-h-20 rounded-lg border p-1.5 ${
+                  className={`min-h-24 p-1.5 ${
                     isToday
-                      ? "border-emerald-500/50 bg-[var(--surface-hover)]"
-                      : "border-[var(--border)]"
+                      ? "bg-[color-mix(in_oklab,var(--accent)_7%,var(--surface))]"
+                      : cellBg
                   }`}
                 >
                   <span
-                    className={`text-[11px] ${
+                    className={`inline-grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs tabular-nums ${
                       isToday
-                        ? "font-bold text-emerald-400"
-                        : "text-[var(--text-faint)]"
+                        ? "bg-[var(--accent)] font-bold text-[var(--accent-contrast)]"
+                        : "font-medium text-[var(--text-faint)]"
                     }`}
                   >
                     {day}
@@ -221,11 +252,13 @@ export function Agenda() {
                         title={`${event.title} — ${event.campus} — ${formatTime(
                           event.date,
                         )}${event.end ? ` – ${formatTime(event.end)}` : ""}`}
-                        className={`truncate rounded px-1 py-0.5 text-left text-[10px] font-medium transition hover:opacity-75 ${
-                          typeInfo(event.type).badge
-                        }`}
+                        style={{ "--tone": typeInfo(event.type).color }}
+                        className="flex items-center gap-1.5 truncate rounded-md bg-[color-mix(in_oklab,var(--tone)_14%,transparent)] px-1.5 py-1 text-left text-[0.6875rem] font-semibold text-[color-mix(in_oklab,var(--tone)_var(--tone-mix),var(--text))] transition hover:bg-[color-mix(in_oklab,var(--tone)_24%,transparent)]"
                       >
-                        {event.campus} · {event.title}
+                        <span className="h-1.5 w-1.5 flex-none rounded-full bg-[var(--tone)]" />
+                        <span className="truncate">
+                          {event.campus} · {event.title}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -237,57 +270,70 @@ export function Agenda() {
       </main>
 
       {selected && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setSelected(null)}
-        >
+        <div className="overlay" onClick={() => setSelected(null)}>
           <div
-            className="w-full max-w-md rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5"
+            role="dialog"
+            aria-modal="true"
+            aria-label={selected.title}
+            className="dialog max-w-md p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
-                    typeInfo(selected.type).badge
-                  }`}
+                  className="badge"
+                  style={{ "--tone": typeInfo(selected.type).color }}
                 >
                   {typeInfo(selected.type).label}
                 </span>
-                <h3 className="mt-2 text-sm font-semibold text-[var(--text)]">
+                <h3 className="mt-3 text-lg font-bold text-[var(--text)]">
                   {selected.title}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-md px-2 py-1 text-xs text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+                aria-label="Fermer"
+                className="btn btn-ghost btn-sm btn-icon"
               >
-                ✕
+                <Icon name="x" size={16} />
               </button>
             </div>
 
-            <div className="mt-3 space-y-1 text-xs text-[var(--text-muted)]">
-              <p>
-                📍 {selected.campus}
-                {selected.location ? ` — ${selected.location}` : ""}
+            <div className="mt-4 space-y-2 text-[0.8125rem] text-[var(--text-muted)]">
+              <p className="flex items-start gap-2.5">
+                <Icon
+                  name="mapPin"
+                  size={16}
+                  className="mt-px text-[var(--text-faint)]"
+                />
+                <span>
+                  {selected.campus}
+                  {selected.location ? ` — ${selected.location}` : ""}
+                </span>
               </p>
-              <p>
-                🕒{" "}
-                {new Date(selected.date).toLocaleDateString("fr-FR", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                {selected.end ? ` – ${formatTime(selected.end)}` : ""}
+              <p className="flex items-start gap-2.5">
+                <Icon
+                  name="clock"
+                  size={16}
+                  className="mt-px text-[var(--text-faint)]"
+                />
+                <span className="first-letter:uppercase">
+                  {new Date(selected.date).toLocaleDateString("fr-FR", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                  {selected.end ? ` – ${formatTime(selected.end)}` : ""}
+                </span>
               </p>
             </div>
 
             {selected.description && (
-              <p className="mt-3 text-xs leading-relaxed text-[var(--text-muted)]">
+              <p className="mt-4 text-sm leading-relaxed text-[var(--text-muted)]">
                 {selected.description}
               </p>
             )}
@@ -297,12 +343,13 @@ export function Agenda() {
                 href={selected.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 block rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-center text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/20"
+                className="btn btn-primary mt-6 h-10 w-full"
               >
                 S'inscrire
+                <Icon name="external" size={15} />
               </a>
             ) : (
-              <p className="mt-4 text-xs text-[var(--text-faint)]">
+              <p className="mt-6 rounded-xl border border-dashed border-[var(--border-strong)] px-4 py-3 text-center text-xs text-[var(--text-faint)]">
                 Lien d'inscription à venir.
               </p>
             )}

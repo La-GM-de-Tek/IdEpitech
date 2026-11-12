@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { DEFAULT_MODE, DEFAULT_THEME, THEMES } from "./themes";
+import { DEFAULT_MODE, DEFAULT_THEME, THEMES, loadThemeFont } from "./themes";
 
 const THEME_KEY = "manta-theme";
 const MODE_KEY = "manta-mode";
@@ -35,14 +35,16 @@ export function ThemeProvider({ children }) {
     localStorage.setItem(THEME_KEY, themeId);
     localStorage.setItem(MODE_KEY, mode);
 
-    const accent =
-      getComputedStyle(root).getPropertyValue("--accent").trim() || "#58a6ff";
-    const svg = THEMES[themeId].pattern(accent);
-    if (svg !== null) {
+    const theme = THEMES[themeId];
+    loadThemeFont(theme);
+    const svg = theme.pattern?.(theme.colors[mode].accent);
+    if (svg) {
       root.style.setProperty(
         "--home-pattern",
         `url("data:image/svg+xml,${encodeURIComponent(svg)}")`,
       );
+    } else {
+      root.style.removeProperty("--home-pattern");
     }
   }, [themeId, mode]);
 

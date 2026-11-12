@@ -1,84 +1,78 @@
 import { LANGUAGES } from "../projects";
-import { useTheme } from "../theme/ThemeContext";
+import Icon from "./Icon";
+
+export function LanguageTile({ lang, small = false }) {
+  const isLetter = /^[A-Za-z]+$/.test(lang.icon);
+  return (
+    <span
+      className={`tile ${small ? "tile--sm" : ""} ${isLetter ? "font-mono font-bold" : ""}`}
+      style={{ "--tone": lang.color }}
+      aria-hidden="true"
+    >
+      {lang.icon}
+    </span>
+  );
+}
 
 export default function ProjectCard({ project, onOpen, ok }) {
   const lang = LANGUAGES[project.language];
-  const { theme } = useTheme();
-  const themeCard =
-    theme.slots?.card ??
-    "rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-emerald-500/50 hover:bg-[var(--surface-hover)]";
-  const shell =
-    ok === "gold"
-      ? `${themeCard} border-amber-400/40! bg-amber-400/[0.06]! hover:border-amber-400/70! hover:bg-amber-400/10!`
-      : themeCard;
+  const gold = ok === "gold";
 
   return (
     <button
       type="button"
       onClick={() => onOpen(project.id)}
-      style={{ "--lang-color": lang.color }}
-      className={`group flex flex-col gap-3 p-5 text-left transition ${
-        ok === "gold" ? "" : "hover:!border-[var(--lang-color)]"
-      } ${shell}`}
+      data-gold={gold || undefined}
+      style={{ "--card-accent": lang.color }}
+      className="card"
     >
-      <div className="flex items-center justify-between">
-        <span className="text-3xl">{lang.icon}</span>
-        <div className="flex items-center gap-2">
+      <div className="flex items-start justify-between gap-3">
+        <LanguageTile lang={lang} />
+        <div className="flex items-center gap-1.5">
           {!project.hasEnd ? (
             <span
-              className="flex h-5 items-center justify-center rounded-full bg-[var(--surface-hover)] px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
+              className="badge badge--quiet"
               title="Projet libre, sans validation"
             >
               Libre
             </span>
-          ) : ok === "gold" ? (
+          ) : gold ? (
             <span
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/20 text-xs font-bold text-amber-400"
+              className="check-dot"
+              style={{ "--tone": "var(--gold)" }}
               title="Terminé — bonus doré"
             >
-              ✓
+              <Icon name="check" size={12} strokeWidth={3} />
             </span>
           ) : ok ? (
             <span
-              className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
-              style={{
-                backgroundColor:
-                  "color-mix(in srgb, var(--lang-color) 12%, transparent)",
-                color: "var(--lang-color)",
-              }}
+              className="check-dot"
+              style={{ "--tone": lang.color }}
               title="Terminé"
             >
-              ✓
+              <Icon name="check" size={12} strokeWidth={3} />
             </span>
           ) : (
-            <span
-              className="flex h-5 items-center justify-center rounded-full bg-[var(--surface-hover)] px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
-              title="À faire"
-            >
+            <span className="badge badge--quiet" title="À faire">
               À faire
             </span>
           )}
-          <span
-            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${lang.badge}`}
-          >
+          <span className="badge" style={{ "--tone": lang.color }}>
             {lang.label}
           </span>
         </div>
       </div>
       <div>
-        <h2 className="text-sm font-semibold text-[var(--text)]">
+        <h2 className="card-title">
           {project.name}
         </h2>
-        <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+        <p className="mt-1 text-[0.8125rem] leading-relaxed text-[var(--text-muted)]">
           {project.description}
         </p>
       </div>
-      <span
-        className={`mt-auto text-xs font-medium opacity-0 transition group-hover:opacity-100 ${
-          ok === "gold" ? "text-amber-400" : "text-[var(--lang-color)]"
-        }`}
-      >
-        Ouvrir →
+      <span className="card-cta">
+        Ouvrir
+        <Icon name="arrowRight" size={14} />
       </span>
     </button>
   );

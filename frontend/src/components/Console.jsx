@@ -1,12 +1,13 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import Icon from "./Icon";
 
 const STREAM_STYLE = {
   stdout: "text-[var(--text)]",
-  stderr: "text-red-400",
+  stderr: "text-[var(--danger)]",
   system: "text-[var(--text-faint)] italic",
-  result: "text-emerald-400",
-  prompt: "text-sky-400",
-  input: "text-amber-300",
+  result: "text-[var(--success)]",
+  prompt: "text-[var(--accent)]",
+  input: "text-[var(--warning)]",
 };
 
 export default function Console({
@@ -30,22 +31,31 @@ export default function Console({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-[var(--bg)]">
-      <div className="flex items-center justify-between border-b border-[var(--border)] px-3 py-1.5">
-        <span className="text-xs font-semibold tracking-wide text-[var(--text-muted)]">
+      <div className="panel-head">
+        <span className="panel-title">
+          <Icon name="terminal" size={14} />
           CONSOLE
         </span>
-        <button
-          onClick={onClear}
-          className="rounded px-2 py-0.5 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-        >
+        <button onClick={onClear} className="btn btn-ghost btn-sm">
+          <Icon name="eraser" size={14} />
           Effacer
         </button>
       </div>
 
       <div
         ref={scrollRef}
-        className="thin-scroll flex-1 overflow-auto px-3 py-2 font-mono text-[13px] leading-relaxed"
+        className="thin-scroll flex-1 overflow-auto px-4 py-3 font-mono text-[13px] leading-relaxed"
       >
+        {lines.length === 0 && !awaitingInput && (
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center font-sans text-sm text-[var(--text-faint)]">
+            <Icon name="terminal" size={22} />
+            <p>
+              Lancez votre code avec <span className="kbd">⌘↵</span> pour voir
+              le résultat ici.
+            </p>
+          </div>
+        )}
+
         {lines.map((line, index) => (
           <span
             key={index}
@@ -57,17 +67,17 @@ export default function Console({
 
         {awaitingInput && (
           <form
-            className="flex"
+            className="mt-1 flex items-center rounded-md bg-[color-mix(in_oklab,var(--warning)_8%,transparent)] px-2 py-1 shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--warning)_30%,transparent)]"
             onSubmit={(event) => {
               event.preventDefault();
               onSubmitInput(inputRef.current.value);
               inputRef.current.value = "";
             }}
           >
-            <span className="text-sky-400">❯ </span>
+            <span className="text-[var(--accent)]">❯&nbsp;</span>
             <input
               ref={inputRef}
-              className="flex-1 bg-transparent font-mono text-[13px] text-amber-300 outline-none"
+              className="flex-1 bg-transparent font-mono text-[13px] text-[var(--warning)] outline-none"
               autoComplete="off"
               spellCheck={false}
             />

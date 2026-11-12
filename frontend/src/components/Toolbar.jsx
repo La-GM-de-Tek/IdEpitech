@@ -1,14 +1,15 @@
 import { LANGUAGES } from "../projects";
+import Icon from "./Icon";
 
-const STATUS = {
+export const STATUS = {
   loading: {
     label: "Chargement de Pyodide…",
-    color: "bg-amber-400",
+    tone: "var(--warning)",
     pulse: true,
   },
-  ready: { label: "Prêt", color: "bg-emerald-400", pulse: false },
-  running: { label: "Exécution…", color: "bg-sky-400", pulse: true },
-  error: { label: "Erreur", color: "bg-red-500", pulse: false },
+  ready: { label: "Prêt", tone: "var(--success)", pulse: false },
+  running: { label: "Exécution…", tone: "var(--accent)", pulse: true },
+  error: { label: "Erreur", tone: "var(--danger)", pulse: false },
 };
 
 const getIcon = (language) => {
@@ -64,10 +65,8 @@ export default function Toolbar({
         type: "text/plain",
       });
     if (window.navigator.msSaveOrOpenBlob)
-      // IE10+
       window.navigator.msSaveOrOpenBlob(file, filename);
     else {
-      // Others
       var url = URL.createObjectURL(file);
       a.href = url;
       a.download = filename;
@@ -81,47 +80,58 @@ export default function Toolbar({
   }
 
   return (
-    <header className="relative flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2">
+    <header className="relative z-20 flex h-14 flex-none items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-3">
       <div className="flex items-center gap-2">
         {onBack && (
-          <button
-            onClick={onBack}
-            className="rounded-md px-2 py-1 text-xs text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-          >
-            {" "}
-            ← Projets{" "}
+          <button onClick={onBack} className="btn btn-ghost group">
+            <Icon
+              name="arrowLeft"
+              size={15}
+              className="transition-transform group-hover:-translate-x-0.5"
+            />
+            Projets
           </button>
         )}
-        <span className="text-lg md:block hidden">{icon}</span>
-        <h1 className="text-sm font-semibold text-[var(--text)] hidden">
-          IDEpitech
-        </h1>
-        <span className="text-xs text-[var(--text-faint)] hidden">{label}</span>
+        <span
+          className={`hidden h-7 w-7 place-items-center rounded-lg text-base md:grid ${
+            /^[A-Za-z]+$/.test(icon) ? "font-mono font-bold" : ""
+          }`}
+          style={{
+            background:
+              "color-mix(in oklab, var(--lang-color, var(--accent)) 14%, transparent)",
+            "--lang-color": LANGUAGES[language]?.color,
+          }}
+          title={label}
+        >
+          {icon}
+        </span>
       </div>
 
-      <h1 className="notch absolute left-1/2 top-0 flex -translate-x-1/2 items-center gap-1.5 rounded-b-2xl border-x border-b border-[var(--border-strong)] px-6 pb-3 pt-2.5 text-xs font-semibold text-[var(--text)] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.8)]">
-        <span className="font-normal text-[var(--text-muted)]">Projet</span>
+      <h1 className="notch notch-title absolute top-0 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-b-2xl border-x border-b border-[var(--border-strong)] px-6 pt-3 pb-3.5 text-[0.8125rem] font-bold text-[var(--text)] shadow-[0_14px_24px_-16px_rgb(0_0_0/0.7)]">
+        <span className="font-medium text-[var(--text-faint)]">Projet</span>
         {projectName}
         {ok && (
           <span
-            className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold ${
-              ok === "gold"
-                ? "bg-amber-400/20 text-amber-400"
-                : "bg-emerald-500/15 text-emerald-400"
-            }`}
+            className="check-dot !h-[1.125rem] !w-[1.125rem]"
+            style={ok === "gold" ? { "--tone": "var(--gold)" } : undefined}
             title={ok === "gold" ? "Terminé — bonus doré" : "Terminé"}
           >
-            ✓
+            <Icon name="check" size={11} strokeWidth={3} />
           </span>
         )}
       </h1>
 
-      <div className="md:flex items-center gap-3 hidden">
-        <div className="flex items-center gap-2">
+      <div className="hidden items-center gap-2 md:flex">
+        <div
+          className="mr-2 flex items-center gap-2"
+          role="status"
+          aria-live="polite"
+        >
           <span
-            className={`h-2 w-2 rounded-full ${s.color} ${s.pulse ? "animate-pulse" : ""}`}
+            className={`status-dot ${s.pulse ? "animate-pulse" : ""}`}
+            style={{ "--tone": s.tone }}
           />
-          <span className="text-xs text-[var(--text-muted)]">
+          <span className="text-xs font-medium text-[var(--text-muted)]">
             {statusLabel}
           </span>
         </div>
@@ -131,19 +141,16 @@ export default function Toolbar({
             exportCode(code);
           }}
           title="Télécharger le code"
-          className="flex items-center gap-1.5 rounded-md border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
+          className="btn btn-outline"
         >
-          <span className="text-sm leading-none">⭳</span>
+          <Icon name="download" size={15} />
           Exporter
         </button>
 
-        <button
-          onClick={onRun}
-          disabled={!canRun}
-          className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          ▶ Exécuter
-          <kbd className="rounded bg-emerald-700/60 px-1 text-[10px]">⌘↵</kbd>
+        <button onClick={onRun} disabled={!canRun} className="btn btn-primary">
+          <Icon name="play" size={13} />
+          Exécuter
+          <kbd className="kbd">⌘↵</kbd>
         </button>
       </div>
     </header>

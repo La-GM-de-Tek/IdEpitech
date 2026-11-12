@@ -3,6 +3,8 @@ import HeaderBar from "../components/HeaderBar";
 import LearningCard from "../components/LearningCard";
 import ProjectCard from "../components/ProjectCard";
 import PatternPage from "../components/PatternPage";
+import Progress from "../components/Progress";
+import Select from "../components/Select";
 import {
   LANGUAGES,
   DIFFICULTIES,
@@ -65,14 +67,16 @@ export default function HomePage({ projects, onOpen }) {
   return (
     <PatternPage>
       <HeaderBar />
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 lg:px-8">
         <section>
-          <h2 className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
-            Apprentissage
-            <span className="rounded-full bg-[var(--surface)] px-2 py-0.5 text-[10px] font-semibold normal-case tracking-normal text-[var(--text-muted)]">
-              {learningDone}/{learningTotal}
-            </span>
-          </h2>
+          <div className="mb-5 flex items-center gap-5">
+            <h2 className="section-title">Apprentissage</h2>
+            <Progress
+              done={learningDone}
+              total={learningTotal}
+              tone="var(--learn)"
+            />
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <LearningCard
               name={"Glossaire"}
@@ -102,59 +106,57 @@ export default function HomePage({ projects, onOpen }) {
             )}
           </div>
         </section>
-        <section className="mt-10">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
-              Projets
-              <span className="rounded-full bg-[var(--surface)] px-2 py-0.5 text-[10px] font-semibold normal-case tracking-normal text-[var(--text-muted)]">
-                {projectsDone}/{projectsTotal}
-              </span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-5">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-muted)] outline-none transition hover:border-emerald-500/50 hover:bg-[var(--surface-hover)]"
-            >
-              <option value="all">Tous les langages</option>
-              {Object.entries(LANGUAGES).map(([id, lang]) => (
-                <option key={id} value={id}>
-                  {lang.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value)}
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-muted)] outline-none transition hover:border-emerald-500/50 hover:bg-[var(--surface-hover)]"
-            >
-              <option value="all">Toutes difficultés</option>
-              {theme.type == "manta"
-                ? DIFFICULTIES.map((level) => (
-                    <option key={level} value={level}>
-                      {level}
-                    </option>
-                  ))
-                : COBRA_DIFFICULTIES.map((level, index) => (
-                    <option
-                      key={DIFFICULTIES[index]}
-                      value={DIFFICULTIES[index]}
-                    >
-                      {level}
-                    </option>
-                  ))}
-            </select>
-            <select
-              value={completion}
-              onChange={(e) => setCompletion(e.target.value)}
-              className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs text-[var(--text-muted)] outline-none transition hover:border-emerald-500/50 hover:bg-[var(--surface-hover)]"
-            >
-              <option value="all">Toutes complétions</option>
-              <option value="no">Non complété</option>
-              <option value="yes">Complété</option>
-              <option value="gold">Gold</option>
-            </select>
+        <section className="mt-14">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+            <div className="flex items-center gap-5">
+              <h2 className="section-title">Projets</h2>
+              <Progress done={projectsDone} total={projectsTotal} />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Select
+                aria-label="Langage"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="all">Tous les langages</option>
+                {Object.entries(LANGUAGES).map(([id, lang]) => (
+                  <option key={id} value={id}>
+                    {lang.label}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                aria-label="Difficulté"
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+              >
+                <option value="all">Toutes difficultés</option>
+                {theme.type == "manta"
+                  ? DIFFICULTIES.map((level) => (
+                      <option key={level} value={level}>
+                        {level}
+                      </option>
+                    ))
+                  : COBRA_DIFFICULTIES.map((level, index) => (
+                      <option
+                        key={DIFFICULTIES[index]}
+                        value={DIFFICULTIES[index]}
+                      >
+                        {level}
+                      </option>
+                    ))}
+              </Select>
+              <Select
+                aria-label="Complétion"
+                value={completion}
+                onChange={(e) => setCompletion(e.target.value)}
+              >
+                <option value="all">Toutes complétions</option>
+                <option value="no">Non complété</option>
+                <option value="yes">Complété</option>
+                <option value="gold">Gold</option>
+              </Select>
+            </div>
           </div>
           {filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -168,7 +170,7 @@ export default function HomePage({ projects, onOpen }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-zinc-500">
+            <p className="rounded-2xl border border-dashed border-[var(--border-strong)] px-6 py-12 text-center text-sm text-[var(--text-muted)]">
               Aucun projet ne correspond à ces filtres.
             </p>
           )}

@@ -36,7 +36,7 @@ func main() {
 		log.Fatalf("db: %v", err)
 	}
 
-	if err := db.AutoMigrate(&User{}); err != nil {
+	if err := db.AutoMigrate(models...); err != nil {
 		log.Fatalf("db migrate: %v", err)
 	}
 
@@ -48,13 +48,7 @@ func main() {
 	}
 	r.Use(cors(allowedOrigin))
 
-	api := r.Group("/api")
-	api.GET("/health", app.handleHealth)
-
-	auth := api.Group("/auth")
-	auth.POST("/register", app.handleRegister)
-	auth.POST("/login", app.handleLogin)
-	auth.GET("/me", app.requireAuth(), app.handleMe)
+	app.registerRoutes(r)
 
 	log.Printf("backend listening on :%s", port)
 	if err := r.Run(":" + port); err != nil {

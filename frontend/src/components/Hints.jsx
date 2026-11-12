@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Icon from "./Icon";
 
 const COOLDOWN_MS = 60 * 60 * 1000;
 const STORAGE_KEY = "manta-hints-";
@@ -45,29 +46,34 @@ export default function Hints({ project }) {
         ? "Demander un indice"
         : `Prochain indice dans ${Math.ceil(remaining / 60000)} min`;
   return (
-    <div className="absolute bottom-3 right-3 z-10 w-72 max-w-[80vw]">
+    <div className="absolute right-4 bottom-4 z-10 flex w-80 max-w-[80vw] flex-col items-end">
       {open && (
-        <div className="mb-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-lg">
-          <span className="text-xs font-semibold text-[var(--text-muted)]">
-            Indices ({state.count}/{hints.length})
-          </span>
+        <div className="dialog mb-2 p-4 [animation-name:pop-in]">
+          <div className="flex items-center justify-between">
+            <span className="text-[0.8125rem] font-bold text-[var(--text)]">
+              Indices
+            </span>
+            <span className="text-xs font-semibold tabular-nums text-[var(--text-faint)]">
+              {state.count}/{hints.length}
+            </span>
+          </div>
           {state.count === 0 ? (
-            <p className="mt-2 text-xs italic text-[var(--text-faint)]">
+            <p className="mt-3 rounded-xl border border-dashed border-[var(--border-strong)] px-3 py-4 text-center text-xs text-[var(--text-faint)]">
               Aucun indice débloqué pour l'instant.
             </p>
           ) : (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-3 flex items-start gap-2">
               <button
                 type="button"
                 onClick={() => setViewIndex((i) => Math.max(i - 1, 0))}
                 disabled={safeIndex === 0}
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-30"
+                className="btn btn-outline btn-sm btn-icon mt-1"
                 aria-label="Indice précédent"
               >
-                ‹
+                <Icon name="chevronLeft" size={14} />
               </button>
-              <p className="min-h-[3rem] flex-1 text-xs leading-relaxed text-[var(--text-muted)]">
-                💡 {hints[safeIndex]}
+              <p className="callout min-h-[3.5rem] flex-1 px-3 py-2.5 text-[0.8125rem] leading-relaxed [--tone:var(--warning)]">
+                {hints[safeIndex]}
               </p>
               <button
                 type="button"
@@ -75,15 +81,15 @@ export default function Hints({ project }) {
                   setViewIndex((i) => Math.min(i + 1, state.count - 1))
                 }
                 disabled={safeIndex >= state.count - 1}
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[var(--border)] text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-30"
+                className="btn btn-outline btn-sm btn-icon mt-1"
                 aria-label="Indice suivant"
               >
-                ›
+                <Icon name="chevronRight" size={14} />
               </button>
             </div>
           )}
           {state.count > 0 && (
-            <div className="mt-1 text-center text-[10px] text-[var(--text-faint)]">
+            <div className="mt-2 text-center text-[0.6875rem] font-medium tabular-nums text-[var(--text-faint)]">
               {safeIndex + 1} / {state.count}
             </div>
           )}
@@ -91,7 +97,7 @@ export default function Hints({ project }) {
             type="button"
             onClick={claim}
             disabled={!canClaim}
-            className="mt-3 w-full rounded-md bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="btn mt-3 w-full bg-[var(--warning)] text-[var(--bg)] hover:brightness-110"
           >
             {label}
           </button>
@@ -100,9 +106,11 @@ export default function Hints({ project }) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] shadow-lg transition hover:bg-[var(--surface-hover)]"
+        aria-expanded={open}
+        className="btn btn-outline h-9 rounded-full px-4 shadow-[var(--shadow-md)]"
       >
-        💡 Indices
+        <Icon name="lightbulb" size={15} className="text-[var(--warning)]" />
+        Indices
       </button>
     </div>
   );

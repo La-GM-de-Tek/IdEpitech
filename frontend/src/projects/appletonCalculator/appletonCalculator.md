@@ -10,12 +10,6 @@ HTML, CSS et JavaScript sont les trois technologies qui composent la majorité d
 
 Votre téléphone refuse soudainement de faire le moindre calcul... Heureusement, vous connaissez un peu le développement web ! Vous allez donc créer votre propre calculatrice, étape par étape.
 
-<!-- Commencez par créer trois fichiers dans un même dossier : `index.html`, `style.css` et `script.js`.
-
-Pour que votre page fonctionne, ces trois fichiers doivent être **reliés entre eux** : le fichier HTML doit « charger » la feuille de style CSS et le fichier JavaScript. Ces liens se placent dans le HTML.
-
-> **Posez-vous les questions :** « comment lier un fichier CSS à une page HTML », « comment ajouter un fichier JavaScript à une page HTML ». Vous découvrirez les balises qui servent à relier une feuille de style et un script à une page web, et où les placer dans le document. -->
-
 ### Étape 1 : Construire l'interface (HTML)
 
 Objectif : créer la structure de la calculatrice, c'est-à-dire un écran d'affichage et une grille de boutons (chiffres, opérateurs, AC et =).

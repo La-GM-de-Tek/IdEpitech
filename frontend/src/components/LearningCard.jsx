@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../theme/ThemeContext";
+import Icon from "./Icon";
 
 export default function LearningCard({
   name,
@@ -8,11 +8,11 @@ export default function LearningCard({
   project,
   onOpen,
   ok,
+  index,
   icon = "📚",
   badge = "Learning",
 }) {
   let navigate = useNavigate();
-  const { theme } = useTheme();
   const handleClick = () => {
     if (project && onOpen) {
       onOpen(project.id);
@@ -23,70 +23,69 @@ export default function LearningCard({
 
   const title = project?.name ?? name;
   const desc = project?.description ?? description;
-  const themeCard =
-    theme.slots?.card ??
-    "rounded-xl border border-purple-500/20 bg-[var(--surface)] hover:bg-[var(--surface-hover)]";
-  const shell =
-    ok === "gold"
-      ? `${themeCard} border-amber-400/40! bg-amber-400/[0.06]! hover:border-amber-400/70! hover:bg-amber-400/10!`
-      : themeCard;
+  const gold = ok === "gold";
+  const inList = index != null;
 
   return (
     <button
       type="button"
-      className={`group flex flex-col gap-3 p-5 text-left transition ${
-        ok === "gold" ? "" : "hover:!border-purple-500/60"
-      } ${shell}`}
+      data-gold={gold || undefined}
+      style={{ "--card-accent": "var(--learn)" }}
+      className="card"
       onClick={handleClick}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-3xl">{icon}</span>
-        <div className="flex items-center gap-2">
-          {ok === "gold" ? (
+      <div className="flex items-start justify-between gap-3">
+        <span
+          className={`tile ${inList ? "font-mono text-base font-bold tabular-nums" : ""}`}
+          style={{ "--tone": "var(--learn)" }}
+          aria-hidden="true"
+        >
+          {inList ? String(index + 1).padStart(2, "0") : icon}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {gold ? (
             <span
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400/20 text-xs font-bold text-amber-400"
+              className="check-dot"
+              style={{ "--tone": "var(--gold)" }}
               title="Terminé — bonus doré"
             >
-              ✓
+              <Icon name="check" size={12} strokeWidth={3} />
             </span>
           ) : ok ? (
             <span
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/10 text-xs font-bold text-purple-300"
+              className="check-dot"
+              style={{ "--tone": "var(--learn)" }}
               title="Terminé"
             >
-              ✓
+              <Icon name="check" size={12} strokeWidth={3} />
             </span>
           ) : (
             project &&
             onOpen &&
             project.hasEnd && (
-              <span
-                className="flex h-5 items-center justify-center rounded-full bg-[var(--surface-hover)] px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
-                title="À faire"
-              >
+              <span className="badge badge--quiet" title="À faire">
                 À faire
               </span>
             )
           )}
-          <span
-            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-purple-500/10 text-purple-300`}
-          >
-            {badge}
-          </span>
+          {!inList && (
+            <span className="badge" style={{ "--tone": "var(--learn)" }}>
+              {badge}
+            </span>
+          )}
         </div>
       </div>
       <div>
-        <h2 className="text-sm font-semibold text-[var(--text)]">{title}</h2>
-        <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+        <h2 className="card-title">
+          {title}
+        </h2>
+        <p className="mt-1 text-[0.8125rem] leading-relaxed text-[var(--text-muted)]">
           {desc}
         </p>
       </div>
-      <span
-        className={`mt-auto text-xs font-medium opacity-0 transition group-hover:opacity-100 ${
-          ok === "gold" ? "text-amber-400" : "text-purple-300"
-        }`}
-      >
-        Ouvrir →
+      <span className="card-cta">
+        Ouvrir
+        <Icon name="arrowRight" size={14} />
       </span>
     </button>
   );

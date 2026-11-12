@@ -24,12 +24,10 @@ export const CAMPUSES = [
 export const EVENT_TYPES = {
   "coding-club": {
     label: "Coding Club",
-    badge: "bg-emerald-500/10 text-emerald-300",
     color: "#10b981",
   },
   "portes-ouvertes": {
     label: "Portes Ouvertes",
-    badge: "bg-sky-500/10 text-sky-300",
     color: "#0ea5e9",
   },
 };
@@ -197,7 +195,10 @@ export async function fetchEvents() {
     const parsed = rowsToEvents(parseCsv(await response.text()));
     return parsed.length ? parsed : FALLBACK_EVENTS;
   } catch (error) {
-    console.warn("Agenda : Sheet injoignable, repli sur la liste locale.", error);
+    console.warn(
+      "Agenda : Sheet injoignable, repli sur la liste locale.",
+      error,
+    );
     return FALLBACK_EVENTS;
   }
 }

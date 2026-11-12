@@ -40,8 +40,8 @@ export function AuthProvider({ children }) {
     return () => controller.abort();
   }, []);
 
-  const openSession = useCallback(({ token, user }) => {
-    localStorage.setItem(TOKEN_KEY, token);
+  const openSession = useCallback(({ access_token, user }) => {
+    localStorage.setItem(TOKEN_KEY, access_token);
     setUser(user);
   }, []);
 

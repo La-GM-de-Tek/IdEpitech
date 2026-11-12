@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useHideDecorations } from "../../components/ThemeBackground";
 import Editor from "../../components/Editor";
 import { usePyodide } from "../../usePyodide";
 import builderRaw from "./sujetCobra.py?raw";
+import Icon from "../../components/Icon";
 
 const STORAGE_KEY = "manta-create-subject-md";
 
@@ -38,6 +40,7 @@ function toBase64(text) {
 }
 
 export default function CreateSubject({ onBack }) {
+  useHideDecorations(true);
   const [markdown, setMarkdown] = useState(
     () => localStorage.getItem(STORAGE_KEY) ?? SAMPLE_MD,
   );
@@ -101,38 +104,47 @@ build_from_markdown(_md)
   const canRun = status === "ready" || status === "running";
   const busy = building || status === "loading";
 
+  const statusTone = busy
+    ? "var(--accent)"
+    : status === "ready"
+      ? "var(--success)"
+      : "var(--warning)";
+
   return (
-    <div className="relative hidden h-full flex-col md:flex">
-      <header className="relative flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2">
+    <div className="relative hidden h-full flex-col bg-[var(--bg)] md:flex">
+      <header className="relative z-20 flex h-14 flex-none items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-3">
         <div className="flex items-center gap-2">
           {onBack && (
-            <button
-              onClick={onBack}
-              className="rounded-md px-2 py-1 text-xs text-[var(--text-muted)] transition hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-            >
-              ← Projets
+            <button onClick={onBack} className="btn btn-ghost group">
+              <Icon
+                name="arrowLeft"
+                size={15}
+                className="transition-transform group-hover:-translate-x-0.5"
+              />
+              Projets
             </button>
           )}
-          <span className="text-lg">📝</span>
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-[color-mix(in_oklab,var(--learn)_14%,transparent)] text-base">
+            📝
+          </span>
         </div>
 
-        <h1 className="notch absolute left-1/2 top-0 flex -translate-x-1/2 items-center gap-1.5 rounded-b-2xl border-x border-b border-[var(--border-strong)] px-6 pb-3 pt-2.5 text-xs font-semibold text-[var(--text)] shadow-[0_8px_18px_-10px_rgba(0,0,0,0.8)]">
-          <span className="font-normal text-[var(--text-muted)]">Projet</span>
+        <h1 className="notch notch-title absolute top-0 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-b-2xl border-x border-b border-[var(--border-strong)] px-6 pt-3 pb-3.5 text-[0.8125rem] font-bold text-[var(--text)] shadow-[0_14px_24px_-16px_rgb(0_0_0/0.7)]">
+          <span className="font-medium text-[var(--text-faint)]">Projet</span>
           Crée ton propre sujet IDEpitech
         </h1>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <div
+            className="mr-2 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
+          >
             <span
-              className={`h-2 w-2 rounded-full ${
-                busy
-                  ? "animate-pulse bg-sky-400"
-                  : status === "ready"
-                    ? "bg-emerald-400"
-                    : "bg-amber-400"
-              }`}
+              className={`status-dot ${busy ? "animate-pulse" : ""}`}
+              style={{ "--tone": statusTone }}
             />
-            <span className="text-xs text-[var(--text-muted)]">
+            <span className="text-xs font-medium text-[var(--text-muted)]">
               {status === "loading"
                 ? "Chargement de Pyodide…"
                 : building
@@ -142,12 +154,8 @@ build_from_markdown(_md)
           </div>
 
           {pdfUrl && (
-            <a
-              href={pdfUrl}
-              download="sujet.pdf"
-              className="flex items-center gap-1.5 rounded-md border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] transition hover:border-[var(--accent)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-            >
-              <span className="text-sm leading-none">⭳</span>
+            <a href={pdfUrl} download="sujet.pdf" className="btn btn-outline">
+              <Icon name="download" size={15} />
               PDF
             </a>
           )}
@@ -155,10 +163,11 @@ build_from_markdown(_md)
           <button
             onClick={handleRun}
             disabled={!canRun || building}
-            className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="btn btn-primary"
           >
-            ▶ Exécuter
-            <kbd className="rounded bg-emerald-700/60 px-1 text-[10px]">⌘↵</kbd>
+            <Icon name="play" size={13} />
+            Exécuter
+            <kbd className="kbd">⌘↵</kbd>
           </button>
         </div>
       </header>
@@ -177,11 +186,15 @@ build_from_markdown(_md)
 
         <section className="flex min-h-0 min-w-0 flex-1 flex-col bg-[var(--bg)]">
           {error ? (
-            <div className="m-auto w-full max-w-lg rounded-md border border-red-500/30 bg-red-500/10 p-4">
-              <div className="mb-2 text-xs font-semibold tracking-wide text-red-300">
+            <div
+              className="callout m-auto w-full max-w-lg p-4"
+              style={{ "--tone": "var(--danger)" }}
+            >
+              <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.08em]">
+                <Icon name="alert" size={15} />
                 ERREUR
               </div>
-              <pre className="thin-scroll overflow-auto whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-red-200">
+              <pre className="thin-scroll overflow-auto font-mono text-[13px] leading-relaxed whitespace-pre-wrap">
                 {error}
               </pre>
             </div>
@@ -194,13 +207,29 @@ build_from_markdown(_md)
             >
               {" "}
             </object>
+          ) : building ? (
+            <div className="m-auto flex items-center gap-2.5 text-sm text-[var(--text-muted)]">
+              <span
+                className="status-dot animate-pulse"
+                style={{ "--tone": "var(--accent)" }}
+              />
+              Génération…
+            </div>
           ) : (
-            <div className="m-auto max-w-md px-6 text-center text-sm text-[var(--text-faint)]">
-              Écrivez votre sujet en Markdown, puis cliquez sur{" "}
-              <span className="font-semibold text-[var(--text-muted)]">
-                Exécuter
-              </span>{" "}
-              pour générer le PDF ici.
+            <div className="m-auto flex max-w-sm flex-col items-center gap-4 px-6 text-center">
+              <span
+                className="tile h-14 w-14 rounded-2xl"
+                style={{ "--tone": "var(--learn)" }}
+              >
+                <Icon name="file" size={24} />
+              </span>
+              <p className="text-sm leading-relaxed text-[var(--text-muted)]">
+                Écrivez votre sujet en Markdown, puis cliquez sur{" "}
+                <span className="font-semibold text-[var(--text)]">
+                  Exécuter
+                </span>{" "}
+                pour générer le PDF ici.
+              </p>
             </div>
           )}
         </section>

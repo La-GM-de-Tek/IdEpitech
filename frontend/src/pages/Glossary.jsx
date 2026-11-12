@@ -1,91 +1,21 @@
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css";
-import MobileBlock from "../components/MobileBlock";
 import HeaderBar from "../components/HeaderBar";
 import LearningCard from "../components/LearningCard";
 import CollapsibleSection from "../components/CollapsibleSection";
 import PatternPage from "../components/PatternPage";
+import PageIntro from "../components/PageIntro";
+import Icon from "../components/Icon";
 import { glossary } from "../glossary";
-import { useTheme } from "../theme/ThemeContext";
 
 const markdownComponents = {
-  h1: ({ children }) => (
-    <h1 className="mb-4 text-2xl font-bold text-[var(--text)]">{children}</h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="mt-6 mb-3 text-lg font-semibold text-[var(--text)]">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="mt-4 mb-2 text-base font-semibold text-[var(--text)]">
-      {children}
-    </h3>
-  ),
-  p: ({ children }) => (
-    <p className="my-3 text-sm leading-relaxed text-[var(--text-muted)]">
-      {children}
-    </p>
-  ),
-  ul: ({ children }) => (
-    <ul className="my-3 list-disc space-y-1 pl-6 text-sm text-[var(--text-muted)]">
-      {children}
-    </ul>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-[var(--text)]">{children}</strong>
-  ),
-  pre: ({ children }) => (
-    <pre className="thin-scroll my-4 overflow-auto rounded-lg border border-[var(--border)] bg-[var(--bg)] p-4 font-mono text-sm">
-      {children}
-    </pre>
-  ),
-  code: ({ className, children, ...props }) => {
-    const { mode } = useTheme();
-
-    return className?.includes("language-") ? (
-      <code
-        className={`${className} ${mode === "light" ? "!bg-[var(--text-muted)]" : ""}`}
-        {...props}
-      >
-        {children}
-      </code>
-    ) : (
-      <code
-        className={
-          "rounded bg-[var(--surface)] px-1.5 py-0.5 font-mono text-[0.85em] text-emerald-300" +
-            mode ===
-          "light"
-            ? "!bg-[var(--text-muted)]"
-            : ""
-        }
-      >
-        {children}
-      </code>
-    );
-  },
   table: ({ children }) => (
-    <div className="thin-scroll my-4 overflow-x-auto">
-      <table className="w-full border-collapse text-sm text-[var(--text-muted)]">
-        {children}
-      </table>
+    <div className="table-wrap thin-scroll">
+      <table>{children}</table>
     </div>
-  ),
-  thead: ({ children }) => (
-    <thead className="bg-[var(--surface)]">{children}</thead>
-  ),
-  th: ({ children }) => (
-    <th className="border border-[var(--border)] px-4 py-2 text-left font-semibold text-[var(--text)]">
-      {children}
-    </th>
-  ),
-  td: ({ children }) => (
-    <td className="border border-[var(--border)] px-4 py-2 align-top">
-      {children}
-    </td>
   ),
 };
 
@@ -109,47 +39,157 @@ function Markdown({ source }) {
   );
 }
 
-function MarkdownViewer({ entry, onBack }) {
+function navLabel(entry) {
+  return (
+    entry.language[0].toUpperCase() +
+    entry.language.slice(1) +
+    " : " +
+    entry.name
+  );
+}
+
+function MarkedownNavigation({ onPrev, prev, onNext, next }) {
+  return (
+    <nav className="mt-14 grid grid-cols-2 gap-3 border-t border-[var(--border)] pt-8">
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={prev == null}
+        className="group flex flex-col items-start gap-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-left transition enabled:hover:border-[color-mix(in_oklab,var(--accent)_50%,var(--border))] enabled:hover:bg-[var(--surface-hover)] disabled:opacity-60"
+      >
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-faint)]">
+          {prev && (
+            <Icon
+              name="arrowLeft"
+              size={14}
+              className="transition-transform group-hover:-translate-x-0.5"
+            />
+          )}
+          {prev ? "Précédent" : "Bonne Lecture !"}
+        </span>
+        {prev && (
+          <span className="text-sm font-semibold text-[var(--text)]">
+            {navLabel(prev)}
+          </span>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={next == null}
+        className="group flex flex-col items-end gap-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-right transition enabled:hover:border-[color-mix(in_oklab,var(--accent)_50%,var(--border))] enabled:hover:bg-[var(--surface-hover)] disabled:opacity-60"
+      >
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-faint)]">
+          {next ? "Suivant" : "Bravo..."}
+          {next && (
+            <Icon
+              name="arrowRight"
+              size={14}
+              className="transition-transform group-hover:translate-x-0.5"
+            />
+          )}
+        </span>
+        {next && (
+          <span className="text-sm font-semibold text-[var(--text)]">
+            {navLabel(next)}
+          </span>
+        )}
+      </button>
+    </nav>
+  );
+}
+
+function MarkdownViewer({ entry, onBack, onPrev, prev, onNext, next }) {
   return (
     <PatternPage animated={false}>
-      <header className="flex items-center gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-6 py-4">
+      <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-[var(--border)] bg-[color-mix(in_oklab,var(--surface)_86%,transparent)] px-4 py-3 backdrop-blur-md sm:px-6">
         <button
           type="button"
           onClick={onBack}
-          className="rounded-lg border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] transition hover:border-purple-500/60 hover:text-purple-300"
+          className="btn btn-outline flex-none"
         >
-          ← Retour
+          <Icon name="arrowLeft" size={15} />
+          Retour
         </button>
-        <div>
-          <h1 className="text-sm font-semibold text-[var(--text)]">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-sm font-bold text-[var(--text)]">
             {entry.name}
           </h1>
-          <p className="text-xs text-[var(--text-faint)]">
+          <p className="truncate text-xs text-[var(--text-faint)]">
             {entry.description}
           </p>
         </div>
+        <div className="flex flex-none gap-1.5">
+          <button
+            type="button"
+            onClick={onPrev}
+            disabled={prev == null}
+            title={prev ? navLabel(prev) : "Bonne Lecture !"}
+            aria-label="Précédent"
+            className="btn btn-outline btn-icon"
+          >
+            <Icon name="chevronLeft" size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={next == null}
+            title={next ? navLabel(next) : "Bravo..."}
+            aria-label="Suivant"
+            className="btn btn-outline btn-icon"
+          >
+            <Icon name="chevronRight" size={16} />
+          </button>
+        </div>
       </header>
-      <main className="thin-scroll flex-1 overflow-auto">
-        <article className="mx-auto max-w-3xl px-6 py-8">
-          <Markdown source={entry.code} />
+      <main>
+        <article className="mx-auto max-w-[44rem] px-6 pt-12 pb-20">
+          <div className="md">
+            <Markdown source={entry.code} />
+          </div>
+          <MarkedownNavigation
+            onPrev={onPrev}
+            prev={prev}
+            onNext={onNext}
+            next={next}
+          />
         </article>
       </main>
     </PatternPage>
   );
 }
 
-export function Glossary() {
-  const [activeId, setActiveId] = useState(null);
+export function Glossary({ embedded = false }) {
+  const { id: routeId } = useParams();
+  const navigate = useNavigate();
+  const [localId, setLocalId] = useState(null);
+  const activeId = embedded ? localId : routeId;
+  const openEntry = (id) =>
+    embedded ? setLocalId(id) : navigate(`/glossary/${id}`);
+  const closeEntry = () =>
+    embedded ? setLocalId(null) : navigate("/glossary");
   const active = glossary.find((entry) => entry.id === activeId) ?? null;
+  const index = glossary.findIndex((entry) => entry.id === activeId);
+  const prev = index > 0 ? glossary[index - 1] : null;
+  const next = index < glossary.length ? glossary[index + 1] : null;
 
   return (
     <div className="h-full block">
       {active ? (
-        <MarkdownViewer entry={active} onBack={() => setActiveId(null)} />
+        <MarkdownViewer
+          key={active.id}
+          entry={active}
+          onBack={closeEntry}
+          onPrev={() => openEntry(prev.id)}
+          prev={prev}
+          onNext={() => openEntry(next.id)}
+          next={next}
+        />
       ) : (
         <PatternPage>
-          <HeaderBar />
-          <main className="mx-auto max-w-5xl px-6 py-8 gap-5">
+          <HeaderBar showAchievements={!embedded} />
+          <main className="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 lg:px-8">
+            <PageIntro title="Glossaire" lede="Apprenez les mots clés" />
             {SECTIONS.map(({ language, label }) => {
               const entries = glossary.filter(
                 (entry) => entry.language === language,
@@ -160,11 +200,12 @@ export function Glossary() {
               return (
                 <CollapsibleSection key={language} title={label}>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {entries.map((entry) => (
+                    {entries.map((entry, index) => (
                       <LearningCard
                         key={entry.id}
                         project={entry}
-                        onOpen={setActiveId}
+                        onOpen={openEntry}
+                        index={index}
                       />
                     ))}
                   </div>

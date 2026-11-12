@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useHideDecorations } from "../components/ThemeBackground";
 import Editor from "../components/Editor";
 import Toolbar from "../components/Toolbar";
 import Subject from "../components/Subject";
@@ -6,7 +7,9 @@ import { usePythonLanguage, SAMPLE_PYTHON } from "../languages/python";
 import { useHtmlLanguage, SAMPLE_HTML } from "../languages/html";
 import { useCLanguage, SAMPLE_C } from "../languages/c";
 import Hints from "../components/Hints";
+import Icon from "../components/Icon";
 import { completionMark } from "../completion";
+import { Glossary } from "./Glossary";
 
 const STORAGE_KEY = "manta-code-";
 
@@ -17,6 +20,7 @@ function buildHtmlDocument({ html, css, javascript }) {
 }
 
 export default function Sandbox({ project, onBack, onNext }) {
+  useHideDecorations(true);
   const language = project.language;
   const isHtml = language === "html";
 
@@ -56,7 +60,7 @@ export default function Sandbox({ project, onBack, onNext }) {
     [lang],
   );
   const [editorWidth, setEditorWidth] = useState(50);
-  const [rightPanel, setRightPanel] = useState(false);
+  const [panel, setPanel] = useState(project.subject ? "subject" : "glossary");
   const runRef = useRef(null);
   const nextRef = useRef(null);
   const splitRef = useRef(null);
@@ -69,7 +73,7 @@ export default function Sandbox({ project, onBack, onNext }) {
     );
   }, [files]);
 
-  const onRequestPanel = useCallback(() => setRightPanel(true), []);
+  const onRequestPanel = useCallback(() => setPanel("console"), []);
 
   const goNext = useCallback(() => {
     if (!onNext) return;
@@ -122,19 +126,22 @@ export default function Sandbox({ project, onBack, onNext }) {
     setEditorWidth(Math.min(80, Math.max(20, nextWidth)));
   }, []);
 
-  const stopDragging = useCallback((event) => {
-    const target = event.currentTarget;
-    if (target.hasPointerCapture?.(event.pointerId)) {
-      target.releasePointerCapture(event.pointerId);
-    }
-    target.removeEventListener("pointermove", handleDragMove);
-    target.removeEventListener("pointerup", stopDragging);
-    target.removeEventListener("pointercancel", stopDragging);
+  const stopDragging = useCallback(
+    (event) => {
+      const target = event.currentTarget;
+      if (target.hasPointerCapture?.(event.pointerId)) {
+        target.releasePointerCapture(event.pointerId);
+      }
+      target.removeEventListener("pointermove", handleDragMove);
+      target.removeEventListener("pointerup", stopDragging);
+      target.removeEventListener("pointercancel", stopDragging);
 
-    document.body.style.userSelect = "";
-    document.body.style.cursor = "";
-    dragStateRef.current = null;
-  }, [handleDragMove]);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      dragStateRef.current = null;
+    },
+    [handleDragMove],
+  );
 
   const handleDividerPointerDown = useCallback(
     (event) => {
@@ -160,7 +167,7 @@ export default function Sandbox({ project, onBack, onNext }) {
     [editorWidth, handleDragMove, stopDragging],
   );
   return (
-    <div className="relative hidden h-full flex-col md:flex">
+    <div className="relative hidden h-full flex-col bg-[var(--bg)] md:flex">
       <Toolbar
         status={status}
         version={version}
@@ -177,7 +184,7 @@ export default function Sandbox({ project, onBack, onNext }) {
         className="grid flex-1 grid-cols-1 overflow-hidden md:flex md:flex-row"
       >
         <section
-          className="min-h-0 min-w-0 border-[var(--border)] md:border-r"
+          className="min-h-0 min-w-0"
           style={{
             flex: `0 0 ${editorWidth}%`,
           }}
@@ -197,37 +204,48 @@ export default function Sandbox({ project, onBack, onNext }) {
           aria-orientation="vertical"
           aria-label="Resize editor and console"
           onPointerDown={handleDividerPointerDown}
-          className="hidden md:block md:h-full md:w-2 md:flex-none md:cursor-col-resize md:bg-[var(--border)] md:hover:bg-sky-500/60 select-none"
-          style={{ touchAction: "none" }}
+          className="split-handle hidden md:block"
         />
         <section className="flex min-h-0 min-w-0 flex-col md:flex-1">
-          {project.subject && (
-            <div className="flex flex-none border-b border-[var(--border)]">
+          <div className="tabs" role="tablist">
+            {project.subject && (
               <button
                 type="button"
-                onClick={() => setRightPanel(false)}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium ${
-                  !rightPanel
-                    ? "bg-[var(--tab-active)] text-white"
-                    : "text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-                }`}
+                role="tab"
+                aria-selected={panel === "subject"}
+                onClick={() => setPanel("subject")}
+                className="tab"
               >
+                <Icon name="file" size={14} />
                 SUJET
               </button>
-              <button
-                type="button"
-                onClick={() => setRightPanel(true)}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium ${
-                  rightPanel
-                    ? "bg-[var(--tab-active)] text-white"
-                    : "text-[var(--text-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)]"
-                }`}
-              >
-                {project.id === "fil-ariane" ? "LABYRINTHE" : "CONSOLE"}
-              </button>
-            </div>
-          )}
-          {rightPanel ? renderPanel() : <Subject subject={project.subject} />}
+            )}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panel === "glossary"}
+              onClick={() => setPanel("glossary")}
+              className="tab"
+            >
+              <Icon name="book" size={14} />
+              GLOSSAIRE
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panel === "console"}
+              onClick={() => setPanel("console")}
+              className="tab"
+            >
+              <Icon name="terminal" size={14} />
+              {project.id === "fil-ariane" ? "LABYRINTHE" : "CONSOLE"}
+            </button>
+          </div>
+          {panel === "subject" && <Subject subject={project.subject} />}
+          <div className={panel === "glossary" ? "contents" : "hidden"}>
+            <Glossary embedded />
+          </div>
+          {panel === "console" && renderPanel()}
         </section>
       </main>
       <Hints project={project} />

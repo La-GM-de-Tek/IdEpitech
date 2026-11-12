@@ -18,14 +18,11 @@ export default function ThemeBackground({ children }) {
 
   return (
     <HideDecorationsContext.Provider value={setHideCount}>
-      <div
-        className={`pointer-events-none fixed inset-0 z-[-1] ${
-          hideCount > 0 ? "invisible" : ""
-        }`}
-        aria-hidden="true"
-      >
-        <ThemeDecorations />
-      </div>
+      {hideCount === 0 && (
+        <div className="pointer-events-none fixed inset-0 z-[-1]" aria-hidden="true">
+          <ThemeDecorations />
+        </div>
+      )}
       {children}
     </HideDecorationsContext.Provider>
   );

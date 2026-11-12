@@ -8,10 +8,10 @@ const inputClass =
 function errorMessage(error, mode) {
   if (error.status === 0) return "Impossible de contacter le serveur.";
   if (mode === "login" && error.status === 401) {
-    return "Email ou mot de passe incorrect.";
+    return "Identifiant ou mot de passe incorrect.";
   }
   if (mode === "register" && error.status === 409) {
-    return "Un compte existe déjà avec cet email.";
+    return "Un compte existe déjà avec cet email ou ce nom d'utilisateur.";
   }
   if (error.status === 400) return "Vérifie les informations saisies.";
   return "Une erreur est survenue. Réessaie plus tard.";
@@ -88,9 +88,9 @@ function AuthModal({ onClose }) {
     setPending(true);
     try {
       if (isRegister) {
-        await register({ email, username, password });
+        await register({ mail: email, username, password });
       } else {
-        await login({ email, password });
+        await login({ login: email, password });
       }
       onClose();
     } catch (err) {
@@ -124,9 +124,9 @@ function AuthModal({ onClose }) {
 
       <form onSubmit={onSubmit} className="mt-4 space-y-3">
         <Field
-          label="Email"
-          type="email"
-          autoComplete="email"
+          label={isRegister ? "Email" : "Email ou nom d'utilisateur"}
+          type={isRegister ? "email" : "text"}
+          autoComplete={isRegister ? "email" : "username"}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
         />
@@ -142,7 +142,9 @@ function AuthModal({ onClose }) {
           />
         )}
         <Field
-          label={isRegister ? "Mot de passe (8 caractères minimum)" : "Mot de passe"}
+          label={
+            isRegister ? "Mot de passe (8 caractères minimum)" : "Mot de passe"
+          }
           type="password"
           autoComplete={isRegister ? "new-password" : "current-password"}
           minLength={isRegister ? 8 : undefined}
@@ -181,7 +183,7 @@ function ProfileModal({ onClose }) {
       <p className="mt-5 text-sm font-medium text-[var(--text)]">
         {user.username}
       </p>
-      <p className="mt-1 text-xs text-[var(--text-muted)]">{user.email}</p>
+      <p className="mt-1 text-xs text-[var(--text-muted)]">{user.mail}</p>
       <button
         type="button"
         onClick={() => {

@@ -2,61 +2,87 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../theme/ThemeContext";
 import SettingsButton from "./SettingsButton";
 import AccountButton from "./AccountButton";
+import Icon from "./Icon";
 import EpitechLogoWhite from "../assets/epitech-eu_BIG.D.svg";
 import EpitechLogoBlue from "../assets/epitech-eu_BIG.svg";
 
-export default function HeaderBar() {
+export default function HeaderBar({ showAchievements = true }) {
   let navigate = useNavigate();
   const { theme, mode } = useTheme();
   const isHome = useLocation().pathname === "/";
+  const HeaderDecor = theme.HeaderDecor;
   const routeChange = () => {
     navigate("/");
   };
 
   return (
-    <header className="flex items-start justify-between border-b border-[var(--border)] bg-[var(--surface)] px-6 py-4">
+    <header className="site-header sticky top-0 z-30 grid grid-cols-[1fr_auto_1fr] items-center border-b border-[var(--border)] bg-[color-mix(in_oklab,var(--surface)_86%,transparent)] px-4 py-3 backdrop-blur-md sm:px-6">
       <button
         onClick={routeChange}
-        disabled={isHome}
-        className={`group ${isHome ? "cursor-default" : "cursor-pointer"}`}
+        disabled={isHome || !showAchievements}
+        title={isHome ? undefined : "Retour à l'accueil"}
+        className={`group flex items-center gap-2.5 justify-self-start rounded-xl py-1 pr-3 pl-1 transition ${
+          isHome || !showAchievements
+            ? "cursor-default"
+            : "cursor-pointer hover:bg-[var(--surface-hover)]"
+        }`}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-lg">
-            <span className={isHome ? "" : "group-hover:hidden"}>
-              {theme.logo}
-            </span>
-            {!isHome && (
-              <span className="hidden group-hover:inline text-[var(--accent)]">
-                ⇜
-              </span>
-            )}
+        <span className="relative grid h-8 w-8 place-items-center rounded-[0.65rem] bg-[color-mix(in_oklab,var(--accent)_14%,transparent)] text-lg leading-none">
+          <span
+            className={`transition duration-200 ${
+              isHome || !showAchievements
+                ? ""
+                : "group-hover:scale-50 group-hover:opacity-0"
+            }`}
+          >
+            {theme.logo}
           </span>
-          <h1 className="text-sm font-semibold text-[var(--text)]">
-            IDEpitech
-          </h1>
-        </div>
+          {!isHome && showAchievements && (
+            <Icon
+              name="arrowLeft"
+              size={18}
+              className="absolute text-[var(--accent)] opacity-0 transition duration-200 group-hover:opacity-100"
+            />
+          )}
+        </span>
+        <span className="brand-word">IDEpitech</span>
       </button>
 
-      {isHome && (
+      {isHome ? (
         <a
           href="https://www.epitech.eu/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Epitech"
-          className="shrink-0 transition hover:opacity-80"
+          className="shrink-0 rounded-md opacity-90 transition hover:opacity-100"
         >
           <img
             src={mode === "dark" ? EpitechLogoWhite : EpitechLogoBlue}
             alt="Epitech"
-            className="h-8 w-auto"
+            className="h-6 w-auto sm:h-7"
           />
         </a>
+      ) : (
+        <span />
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 justify-self-end">
+        {showAchievements && (
+          <button
+            type="button"
+            onClick={() => navigate("/achievements")}
+            title="Succès"
+            aria-label="Succès"
+            className="btn btn-outline btn-icon"
+          >
+            <Icon name="trophy" size={17} />
+          </button>
+        )}
         <AccountButton />
         <SettingsButton />
       </div>
+
+      {HeaderDecor && <HeaderDecor mode={mode} />}
     </header>
   );
 }

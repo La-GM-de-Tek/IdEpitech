@@ -1,14 +1,19 @@
 import { useTheme } from "../theme/ThemeContext";
 
 export default function ThemeDecorations() {
-  const { theme } = useTheme();
+  const { theme, themeId, mode } = useTheme();
   const Overlay = theme.Overlay;
-
-  if (!Overlay) return null;
 
   return (
     <div className="theme-decorations" aria-hidden="true">
-      <Overlay />
+      <div className="decor-sky" />
+      {Overlay && (
+        <Overlay
+          key={`${themeId}-${mode}`}
+          mode={mode}
+          palette={theme.colors[mode]}
+        />
+      )}
     </div>
   );
 }
