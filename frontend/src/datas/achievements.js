@@ -248,7 +248,8 @@ export const ACHIEVEMENTS = [
     name: "Sans filet",
     description: "Terminer un projet guidé sans utiliser d'indice.",
     icon: "🧠",
-    check: () => projectIds.some((id) => isCompleted(id) && hintsUsed(id) === 0),
+    check: () =>
+      projectIds.some((id) => isCompleted(id) && hintsUsed(id) === 0),
   },
   {
     id: "first-hint",
