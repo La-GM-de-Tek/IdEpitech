@@ -1,4 +1,3 @@
-// One stroke family for every UI glyph (24px grid, 1.75 stroke, round caps).
 const PATHS = {
   settings: (
     <>
@@ -113,6 +112,12 @@ const PATHS = {
     <>
       <path d="m4 17 6-6-6-6" />
       <path d="M12 19h8" />
+    </>
+  ),
+  book: (
+    <>
+      <path d="M12 7v14" />
+      <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
     </>
   ),
   file: (

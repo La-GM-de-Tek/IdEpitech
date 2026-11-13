@@ -10,6 +10,7 @@ import Hints from "../components/Hints";
 import Icon from "../components/Icon";
 import { completionMark } from "../completion";
 import { trackRun, trackTime } from "../activity";
+import { Glossary } from "./Glossary";
 
 const STORAGE_KEY = "manta-code-";
 const TIME_TICK_SECONDS = 30;
@@ -61,7 +62,7 @@ export default function Sandbox({ project, onBack, onNext }) {
     [lang],
   );
   const [editorWidth, setEditorWidth] = useState(50);
-  const [rightPanel, setRightPanel] = useState(false);
+  const [panel, setPanel] = useState(project.subject ? "subject" : "glossary");
   const runRef = useRef(null);
   const nextRef = useRef(null);
   const splitRef = useRef(null);
@@ -74,14 +75,7 @@ export default function Sandbox({ project, onBack, onNext }) {
     );
   }, [files]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (!document.hidden) trackTime(project.id, TIME_TICK_SECONDS);
-    }, TIME_TICK_SECONDS * 1000);
-    return () => clearInterval(timer);
-  }, [project.id]);
-
-  const onRequestPanel = useCallback(() => setRightPanel(true), []);
+  const onRequestPanel = useCallback(() => setPanel("console"), []);
 
   const goNext = useCallback(() => {
     if (!onNext) return;
@@ -215,35 +209,45 @@ export default function Sandbox({ project, onBack, onNext }) {
           className="split-handle hidden md:block"
         />
         <section className="flex min-h-0 min-w-0 flex-col md:flex-1">
-          {project.subject && (
-            <div className="tabs" role="tablist">
+          <div className="tabs" role="tablist">
+            {project.subject && (
               <button
                 type="button"
                 role="tab"
-                aria-selected={!rightPanel}
-                onClick={() => setRightPanel(false)}
+                aria-selected={panel === "subject"}
+                onClick={() => setPanel("subject")}
                 className="tab"
               >
                 <Icon name="file" size={14} />
                 SUJET
               </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={rightPanel}
-                onClick={() => setRightPanel(true)}
-                className="tab"
-              >
-                <Icon name="terminal" size={14} />
-                {project.id === "fil-ariane" ? "LABYRINTHE" : "CONSOLE"}
-              </button>
-            </div>
-          )}
-          {rightPanel || !project.subject ? (
-            renderPanel()
-          ) : (
-            <Subject subject={project.subject} />
-          )}
+            )}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panel === "glossary"}
+              onClick={() => setPanel("glossary")}
+              className="tab"
+            >
+              <Icon name="book" size={14} />
+              GLOSSAIRE
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={panel === "console"}
+              onClick={() => setPanel("console")}
+              className="tab"
+            >
+              <Icon name="terminal" size={14} />
+              {project.id === "fil-ariane" ? "LABYRINTHE" : "CONSOLE"}
+            </button>
+          </div>
+          {panel === "subject" && <Subject subject={project.subject} />}
+          <div className={panel === "glossary" ? "contents" : "hidden"}>
+            <Glossary embedded />
+          </div>
+          {panel === "console" && renderPanel()}
         </section>
       </main>
       <Hints project={project} />

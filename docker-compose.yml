@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-Idepitech}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Idepitech}
+      POSTGRES_DB: ${POSTGRES_DB:-Idepitech}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    build:
+      context: ./backend
+    image: idepitech-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-Idepitech}:${POSTGRES_PASSWORD:-Idepitech}@db:5432/${POSTGRES_DB:-Idepitech}?sslmode=disable
+      SECRET_KEY: ${SECRET_KEY:-Idepitech}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      PORT: 8080
+      GIN_MODE: release
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+    image: idepitech-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
