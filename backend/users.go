@@ -1,12 +1,9 @@
 package main
 
 import (
-	"errors"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type userURI struct {
@@ -43,14 +40,7 @@ type updateUserRequest struct {
 
 func (app *App) handleMe(c *gin.Context) {
 	var user User
-	err := app.db.WithContext(c.Request.Context()).First(&user, c.GetUint(userIDCtxKey)).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		respondError(c, http.StatusNotFound, "NOT_FOUND", "user not found")
-		return
-	}
-	if err != nil {
-		log.Printf("me: select: %v", err)
-		respondError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "internal error")
+	if !getUserMe(c, app.db, &user) {
 		return
 	}
 
@@ -60,8 +50,21 @@ func (app *App) handleMe(c *gin.Context) {
 func (app *App) handleUpdateMe(c *gin.Context) {
 	var req updateMeRequest
 	bindBody(c, &req)
-	// TODO
-	respondNotImplemented(c)
+
+	var user User
+	if !getUserMe(c, app.db, &user) {
+		return
+	}
+
+	updates, ok := buildUserMeUpdates(c, req)
+	if !ok {
+		return
+	}
+	if !applyUserUpdates(c, app.db, &user, updates) {
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }
 
 func (app *App) handleUpdateMyPassword(c *gin.Context) {
