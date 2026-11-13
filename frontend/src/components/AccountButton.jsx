@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 const inputClass =
@@ -177,6 +178,7 @@ function AuthModal({ onClose }) {
 
 function ProfileModal({ onClose }) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Modal title="Mon compte" onClose={onClose}>
@@ -184,6 +186,16 @@ function ProfileModal({ onClose }) {
         {user.username}
       </p>
       <p className="mt-1 text-xs text-[var(--text-muted)]">{user.mail}</p>
+      <button
+        type="button"
+        onClick={() => {
+          onClose();
+          navigate("/profile");
+        }}
+        className="mt-4 w-full rounded-md border border-[var(--accent)] px-2 py-1.5 text-xs font-medium text-[var(--accent)] transition hover:bg-[var(--surface-hover)]"
+      >
+        Voir ma fiche
+      </button>
       <button
         type="button"
         onClick={() => {
