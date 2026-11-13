@@ -19,7 +19,7 @@ import { useTheme } from "../theme/ThemeContext";
 
 const formatNumber = (value) => value.toLocaleString("fr-FR");
 
-function formatDuration(seconds) {
+export function formatDuration(seconds) {
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes} min`;
   const rest = String(minutes % 60).padStart(2, "0");
@@ -93,7 +93,7 @@ function PlayerCard({ stats }) {
   );
 }
 
-function StatTile({ icon, label, value, detail }) {
+export function StatTile({ icon, label, value, detail }) {
   return (
     <div className="stat-panel flex items-start gap-3">
       <span className="tile tile--sm" aria-hidden="true">
