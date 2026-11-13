@@ -75,6 +75,13 @@ export default function Sandbox({ project, onBack, onNext }) {
     );
   }, [files]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!document.hidden) trackTime(project.id, TIME_TICK_SECONDS);
+    }, TIME_TICK_SECONDS * 1000);
+    return () => clearInterval(timer);
+  }, [project.id]);
+
   const onRequestPanel = useCallback(() => setPanel("console"), []);
 
   const goNext = useCallback(() => {

@@ -43,6 +43,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="/glossary/:id?" element={<Glossary />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/achievements" element={<Achievements />} />
+              <Route path="/stats" element={<Stats />} />
             </Routes>
           </BrowserRouter>
         </ThemeBackground>

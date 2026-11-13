@@ -76,15 +76,6 @@ export default function HeaderBar({ showAchievements = true }) {
         >
           <Icon name="chart" size={17} />
         </button>
-        <button
-          type="button"
-          onClick={() => navigate("/achievements")}
-          title="Succès"
-          aria-label="Succès"
-          className="btn btn-outline btn-icon"
-        >
-          <Icon name="trophy" size={17} />
-        </button>
         {showAchievements && (
           <button
             type="button"
