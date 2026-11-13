@@ -24,7 +24,7 @@ const countCompleted = (ids) => ids.filter((id) => isCompleted(id)).length;
 const allCompleted = (ids) => ids.every((id) => isCompleted(id));
 const isGold = (id) => completionMark(id) === "gold";
 
-function hintsUsed(id) {
+export function hintsUsed(id) {
   try {
     return JSON.parse(localStorage.getItem(HINTS_KEY + id))?.count ?? 0;
   } catch {

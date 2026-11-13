@@ -67,6 +67,24 @@ export default function HeaderBar({ showAchievements = true }) {
       )}
 
       <div className="flex items-center gap-2 justify-self-end">
+        <button
+          type="button"
+          onClick={() => navigate("/stats")}
+          title="Statistiques"
+          aria-label="Statistiques"
+          className="btn btn-outline btn-icon"
+        >
+          <Icon name="chart" size={17} />
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/achievements")}
+          title="Succès"
+          aria-label="Succès"
+          className="btn btn-outline btn-icon"
+        >
+          <Icon name="trophy" size={17} />
+        </button>
         {showAchievements && (
           <button
             type="button"

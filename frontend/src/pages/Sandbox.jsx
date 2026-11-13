@@ -9,9 +9,11 @@ import { useCLanguage, SAMPLE_C } from "../languages/c";
 import Hints from "../components/Hints";
 import Icon from "../components/Icon";
 import { completionMark } from "../completion";
+import { trackRun, trackTime } from "../activity";
 import { Glossary } from "./Glossary";
 
 const STORAGE_KEY = "manta-code-";
+const TIME_TICK_SECONDS = 30;
 
 function buildHtmlDocument({ html, css, javascript }) {
   const styleTag = css ? `\n<style>\n${css}\n</style>` : "";
@@ -108,10 +110,10 @@ export default function Sandbox({ project, onBack, onNext }) {
 
   const { status, version, execute, renderPanel } = active;
 
-  const handleRun = useCallback(
-    () => execute(isHtml ? buildHtmlDocument(files) : files[language]),
-    [execute, files, isHtml, language],
-  );
+  const handleRun = useCallback(() => {
+    if (status === "ready" || status === "running") trackRun(project.id);
+    return execute(isHtml ? buildHtmlDocument(files) : files[language]);
+  }, [execute, files, isHtml, language, project.id, status]);
 
   runRef.current = handleRun;
 
