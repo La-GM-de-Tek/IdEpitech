@@ -8,6 +8,9 @@ import HyruleDefenseSubject from "../projects/hyruleDefense/hyruleDefense.pdf";
 import HyruleDefenseHelpers from "../projects/hyruleDefense/sceaux.py?raw";
 import FilDariane from "../projects/filDariane/filDariane";
 import HyruleDefense from "../projects/hyruleDefense/hyruleDefense";
+import FeuTricoloreSubject from "../projects/feuTricolore/feuTricolore.pdf";
+import FeuTricoloreHelpers from "../projects/feuTricolore/carrefour.py?raw";
+import FeuTricolore from "../projects/feuTricolore/feuTricolore";
 import {
   expectedHyruleAttack,
   explanationHyruleAttack,
@@ -22,6 +25,10 @@ import {
   explanationFilDariane,
   hintsFilDariane,
 } from "../projects/filDariane/values";
+import {
+  explanationFeuTricolore,
+  hintsFeuTricolore,
+} from "../projects/feuTricolore/values";
 
 export const DIFF = [
   "🥚 - Oeuf",
@@ -90,5 +97,19 @@ export const guidedProjects = [
     difficulty: DIFF[3],
     hasEnd: true,
     component: HyruleDefense,
+  },
+  {
+    id: "feu-tricolore",
+    name: "Feu Tricolore",
+    language: "python",
+    description: "Programmez les feux du carrefour sans provoquer d'accident.",
+    subject: FeuTricoloreSubject,
+    beforeCode: FeuTricoloreHelpers,
+    afterCode: "_feu_end()",
+    explanation: explanationFeuTricolore,
+    hints: hintsFeuTricolore,
+    difficulty: DIFF[0],
+    hasEnd: true,
+    component: FeuTricolore,
   },
 ];
