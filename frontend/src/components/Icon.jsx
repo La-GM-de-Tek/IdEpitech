@@ -40,6 +40,12 @@ const PATHS = {
     />
   ),
   stop: <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />,
+  pause: (
+    <>
+      <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+      <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+    </>
+  ),
   crosshair: (
     <>
       <circle cx="12" cy="12" r="8" />
