@@ -19,6 +19,11 @@ const cIds = toIds(learningCProjects);
 const learningIds = [...pythonIds, ...cIds];
 const countableProjects = guidedProjects.filter((project) => project.hasEnd);
 const projectIds = toIds(countableProjects);
+const goldableIds = toIds(
+  countableProjects.filter(
+    (project) => !project.steps || project.steps.some((step) => step.bonus),
+  ),
+);
 
 const countCompleted = (ids) => ids.filter((id) => isCompleted(id)).length;
 const allCompleted = (ids) => ids.every((id) => isCompleted(id));
@@ -232,15 +237,16 @@ export const ACHIEVEMENTS = [
     name: "Bonus doré",
     description: "Obtenir le bonus doré sur un projet.",
     icon: "🏅",
-    check: () => projectIds.some(isGold),
+    check: () => goldableIds.some(isGold),
   },
   {
     id: "all-gold",
     category: "projects",
     name: "Tout en or",
-    description: "Obtenir le bonus doré sur tous les projets guidés.",
+    description:
+      "Obtenir le bonus doré sur tous les projets guidés qui en ont un.",
     icon: "👑",
-    check: () => projectIds.every(isGold),
+    check: () => goldableIds.every(isGold),
   },
   {
     id: "no-hint",

@@ -1,5 +1,6 @@
 import { LANGUAGES } from "../projects";
 import Icon from "./Icon";
+import { getStepProgress } from "../steps";
 
 export function LanguageTile({ lang, small = false }) {
   const isLetter = /^[A-Za-z]+$/.test(lang.icon);
@@ -17,6 +18,7 @@ export function LanguageTile({ lang, small = false }) {
 export default function ProjectCard({ project, onOpen, ok }) {
   const lang = LANGUAGES[project.language];
   const gold = ok === "gold";
+  const progress = project.hasEnd && !ok ? getStepProgress(project) : null;
 
   return (
     <button
@@ -51,6 +53,13 @@ export default function ProjectCard({ project, onOpen, ok }) {
               title="Terminé"
             >
               <Icon name="check" size={12} strokeWidth={3} />
+            </span>
+          ) : progress?.passedCount ? (
+            <span
+              className="badge badge--quiet tabular-nums"
+              title={`${progress.passedCount} étape${progress.passedCount > 1 ? "s" : ""} validée${progress.passedCount > 1 ? "s" : ""} sur ${progress.steps.length}`}
+            >
+              {progress.passedCount}/{progress.steps.length} étapes
             </span>
           ) : (
             <span className="badge badge--quiet" title="À faire">

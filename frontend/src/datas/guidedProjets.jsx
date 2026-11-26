@@ -12,23 +12,27 @@ import FeuTricoloreSubject from "../projects/feuTricolore/feuTricolore.pdf";
 import FeuTricoloreHelpers from "../projects/feuTricolore/carrefour.py?raw";
 import FeuTricolore from "../projects/feuTricolore/feuTricolore";
 import {
-  expectedHyruleAttack,
   explanationHyruleAttack,
-  goldenExpectedHyruleAttack,
   hintsHyruleAttack,
+  stepsHyruleAttack,
 } from "../projects/hyruleAttack/values";
 import {
   explanationHyruleDefense,
   hintsHyruleDefense,
+  stepsHyruleDefense,
 } from "../projects/hyruleDefense/values";
 import {
   explanationFilDariane,
   hintsFilDariane,
+  stepsFilDariane,
 } from "../projects/filDariane/values";
 import {
   explanationFeuTricolore,
   hintsFeuTricolore,
+  stepsFeuTricolore,
 } from "../projects/feuTricolore/values";
+import { stepsAppletonCalculator } from "../projects/appletonCalculator/values";
+import { checkAppleton } from "../projects/appletonCalculator/checks";
 
 export const DIFF = [
   "🥚 - Oeuf",
@@ -54,6 +58,7 @@ export const guidedProjects = [
     afterCode: "",
     explanation: explanationFilDariane,
     hints: hintsFilDariane,
+    steps: stepsFilDariane,
     difficulty: DIFF[2],
     hasEnd: true,
     component: FilDariane,
@@ -66,8 +71,10 @@ export const guidedProjects = [
     subject: AppletonSubject,
     beforeCode: "",
     afterCode: "",
+    steps: stepsAppletonCalculator,
+    checkHtml: checkAppleton,
     difficulty: DIFF[1],
-    hasEnd: false,
+    hasEnd: true,
   },
   {
     id: "hyrule-attack",
@@ -77,10 +84,9 @@ export const guidedProjects = [
     subject: HyruleAttackSubject,
     beforeCode: HyruleAttackHelpers,
     afterCode: HyruleAttackGrader,
-    expected: expectedHyruleAttack,
-    goldenExpected: goldenExpectedHyruleAttack,
     explanation: explanationHyruleAttack,
     hints: hintsHyruleAttack,
+    steps: stepsHyruleAttack,
     difficulty: DIFF[2],
     hasEnd: true,
   },
@@ -94,6 +100,7 @@ export const guidedProjects = [
     afterCode: "",
     explanation: explanationHyruleDefense,
     hints: hintsHyruleDefense,
+    steps: stepsHyruleDefense,
     difficulty: DIFF[3],
     hasEnd: true,
     component: HyruleDefense,
@@ -108,6 +115,7 @@ export const guidedProjects = [
     afterCode: "_feu_end()",
     explanation: explanationFeuTricolore,
     hints: hintsFeuTricolore,
+    steps: stepsFeuTricolore,
     difficulty: DIFF[0],
     hasEnd: true,
     component: FeuTricolore,
