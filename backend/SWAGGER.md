@@ -678,6 +678,18 @@ Supprime aussi les lignes `ThemeToUser` et met à `NULL` les `Session.theme` qui
 
 Thèmes débloqués par l'utilisateur. **200** : liste de `UserTheme` (non paginée, la liste est courte).
 
+### `POST /users/me/themes` - 🔒 User
+
+Débloque un thème récompense pour l'utilisateur connecté (niveau atteint, projet terminé…). Idempotent : si le thème est déjà débloqué, renvoie la ligne existante en **200**.
+
+Les thèmes récompenses (tous sauf `default` et `hiver`) sont créés au démarrage du serveur.
+
+| Paramètre | Où   | Type   | Requis | Description  |
+| --------- | ---- | ------ | :----: | ------------ |
+| `name`    | body | string |   ✅   | Nom du thème |
+
+**201** : `UserTheme`. Erreurs : `400`, `404`.
+
 ### `POST /users/{id}/themes` - 🛡️ Admin
 
 Donne un thème à un utilisateur sans passer par une session.
@@ -882,6 +894,7 @@ Même réponse que `GET /users/me/sessions`, pour n'importe quel utilisateur.
 | PATCH   | `/themes/{id}`                                             | 🛡️ Admin |
 | DELETE  | `/themes/{id}`                                             | 🛡️ Admin |
 | GET     | `/users/me/themes`                                         | 🔒 User  |
+| POST    | `/users/me/themes`                                         | 🔒 User  |
 | POST    | `/users/{id}/themes`                                       | 🛡️ Admin |
 | DELETE  | `/users/{id}/themes/{theme_id}`                            | 🛡️ Admin |
 | GET     | `/languages`                                               | Public   |

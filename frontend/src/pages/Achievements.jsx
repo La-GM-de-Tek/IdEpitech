@@ -9,7 +9,7 @@ import {
   ACHIEVEMENT_CATEGORIES,
   checkAchievements,
 } from "../datas/achievements";
-import { REWARDS, unlockedRewards } from "../datas/rewards";
+import { REWARDS, useUnlockedRewards } from "../datas/rewards";
 
 function RewardCard({ reward, unlocked }) {
   return (
@@ -97,7 +97,7 @@ function AchievementCard({ achievement, date }) {
 
 export function Achievements() {
   const [unlocked] = useState(checkAchievements);
-  const [rewards] = useState(() => unlockedRewards());
+  const rewards = useUnlockedRewards();
   const countUnlocked = (list) =>
     list.filter((achievement) => unlocked[achievement.id]).length;
 

@@ -67,6 +67,7 @@ func (app *App) registerRoutes(r *gin.Engine) {
 	admin.PATCH("/themes/:id", app.handleUpdateTheme)
 	admin.DELETE("/themes/:id", app.handleDeleteTheme)
 	user.GET("/users/me/themes", app.handleListMyThemes)
+	user.POST("/users/me/themes", app.handleUnlockMyTheme)
 	admin.POST("/users/:id/themes", app.handleGrantUserTheme)
 	admin.DELETE("/users/:id/themes/:theme_id", app.handleRevokeUserTheme)
 

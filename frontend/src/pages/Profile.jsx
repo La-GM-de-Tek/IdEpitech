@@ -15,7 +15,7 @@ import {
   saveProfile,
 } from "../datas/profile";
 import { computeLocalStats, levelInfo, rankInfo } from "../datas/stats";
-import { lockedTargets, rewardFor, unlockedRewards } from "../datas/rewards";
+import { lockedTargets, rewardFor, useUnlockedRewards } from "../datas/rewards";
 import { COBRA_DIFFICULTIES, DIFFICULTIES } from "../projects";
 import { useTheme } from "../theme/ThemeContext";
 import { StatTile } from "./Stats";
@@ -115,7 +115,7 @@ function IdentityCard({ user, view, stats, editing, onChange }) {
     language.runs > best.runs ? language : best,
   );
   const pseudo = view.pseudo || user.username;
-  const lockedAvatars = lockedTargets("avatar", unlockedRewards(stats));
+  const lockedAvatars = lockedTargets("avatar", useUnlockedRewards(stats));
 
   return (
     <section className="player-card">

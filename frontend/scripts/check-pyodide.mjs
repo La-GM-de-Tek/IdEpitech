@@ -1,5 +1,3 @@
-// Replays the Pyodide worker init in Node so a broken dependency fails CI
-// instead of the site. Needs `pyodide@<PYODIDE_VERSION>` installed.
 import { readFileSync } from "node:fs";
 import { loadPyodide, version } from "pyodide";
 

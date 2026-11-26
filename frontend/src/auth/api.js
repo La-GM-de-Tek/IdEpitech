@@ -58,3 +58,16 @@ export function register({ username, mail, password }) {
 export function fetchMe(token, signal) {
   return request("/users/me", { token, signal });
 }
+
+export function fetchMyThemes(token, signal) {
+  return request("/users/me/themes", { token, signal });
+}
+
+export function unlockMyTheme(token, name, signal) {
+  return request("/users/me/themes", {
+    method: "POST",
+    body: { name },
+    token,
+    signal,
+  });
+}
