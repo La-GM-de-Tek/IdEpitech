@@ -45,14 +45,16 @@ Projects are declared in [src/projects.jsx](src/projects.jsx). Adding one is a c
    - `learningPythonProjects` / `learningCProjects` — short, auto-checked exercises.
    - `guidedProjects` — a full subject with a PDF, shown on the home page.
 2. Add an entry
-3. Put your assets in `src/projects/<myProject>/` (statement `.md`, `.pdf`, images, helper `.py` imported with `?raw`). Follow the layout of [src/projects/filDariane/](src/projects/filDariane/).
+3. Put your assets in `src/projects/<myProject>/` (statement `.md`, `.pdf`, images, helper `.py` imported with `?raw`). Follow the layout of `filDariane/`.
 4. Need a custom visualiser instead of the plain console? Add a `<myProject>.jsx` component next to the assets, like `filDariane.jsx`.
 5. Split a guided project into steps with a `steps` array (see below).
 6. Run `npm run dev`, check your exercise passes with a correct solution **and** fails with a wrong one.
 
+`frontend/src/projects/` is a git submodule pointing to [La-GM-de-Tek/IdEpitech-projects](https://github.com/La-GM-de-Tek/IdEpitech-projects). Clone with `git clone --recurse-submodules`, or run `git submodule update --init` on an existing clone. Project files go through a PR on that repo (see its [CONTRIBUTING.md](https://github.com/La-GM-de-Tek/IdEpitech-projects/blob/main/CONTRIBUTING.md)); the declaration in step 2 and the submodule bump go through a PR here.
+
 ### Split a subject into steps
 
-A guided project gets a `steps` array, usually declared in its `values.js` ([feuTricolore/values.js](frontend/src/projects/feuTricolore/values.js) is a good model). The editor shows a step tracker (the current step unfolds to show its title, its goal is in the tooltip), the hints follow the selected step, and the steps unlock in order.
+A guided project gets a `steps` array, usually declared in its `values.js` ([feuTricolore/values.js](https://github.com/La-GM-de-Tek/IdEpitech-projects/blob/main/feuTricolore/values.js) is a good model). The editor shows a step tracker (the current step unfolds to show its title, its goal is in the tooltip), the hints follow the selected step, and the steps unlock in order.
 
 ```js
 export const stepsMyProject = [
@@ -69,9 +71,9 @@ export const stepsMyProject = [
 
 How a step gets passed depends on the subject:
 
-- **Console output** — give every step a `check: (stdout) => boolean`, like [hyruleAttack/values.js](frontend/src/projects/hyruleAttack/values.js). After each run, the steps are checked in order until one fails.
+- **Console output** — give every step a `check: (stdout) => boolean`, like [hyruleAttack/values.js](https://github.com/La-GM-de-Tek/IdEpitech-projects/blob/main/hyruleAttack/values.js). After each run, the steps are checked in order until one fails.
 - **Visualiser** — the component calls `passSteps(project, [stepId])` from [steps.js](frontend/src/steps.js) when a run succeeds, and uses `useStepGate(project, stepId)` to show `<StepLocked>` when the student plays a step that is still locked.
-- **HTML** — give the project a `checkHtml: (html) => Promise<{ [stepId]: [{ label, ok, detail? }] }>`, like [appletonCalculator/checks.js](frontend/src/projects/appletonCalculator/checks.js), which clicks through the page in hidden sandboxed frames.
+- **HTML** — give the project a `checkHtml: (html) => Promise<{ [stepId]: [{ label, ok, detail? }] }>`, like [appletonCalculator/checks.js](https://github.com/La-GM-de-Tek/IdEpitech-projects/blob/main/appletonCalculator/checks.js), which clicks through the page in hidden sandboxed frames.
 
 The subject's completion mark (`true` / `"gold"`) is derived from its steps, so the stats, achievements and cards keep working unchanged.
 
