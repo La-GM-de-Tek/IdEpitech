@@ -10,10 +10,12 @@ import { Glossary } from "./pages/Glossary.jsx";
 import { Agenda } from "./pages/Agenda.jsx";
 import { Achievements } from "./pages/Achievements.jsx";
 import { Stats } from "./pages/Stats.jsx";
+import { Profile } from "./pages/Profile.jsx";
 import { ThemeProvider } from "./theme/ThemeContext.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { applyThemeStyles } from "./theme/themes.jsx";
 import ThemeBackground from "./components/ThemeBackground.jsx";
+import ThemeGuard from "./components/ThemeGuard.jsx";
 
 applyThemeStyles();
 
@@ -21,6 +23,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
+        <ThemeGuard />
         <ThemeBackground>
           <BrowserRouter>
             <Routes>
@@ -44,6 +47,7 @@ createRoot(document.getElementById("root")).render(
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/stats" element={<Stats />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </BrowserRouter>
         </ThemeBackground>

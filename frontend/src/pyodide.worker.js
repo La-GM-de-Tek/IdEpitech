@@ -53,7 +53,7 @@ async function init() {
   pyodide.setInterruptBuffer(interrupt);
   await pyodide.loadPackage("micropip");
   const micropip = pyodide.pyimport("micropip");
-  await micropip.install("reportlab");
+  await micropip.install("reportlab==5.1.0");
   ready = true;
   self.postMessage({ type: "ready", version: pyodide.version });
 }

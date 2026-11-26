@@ -8,20 +8,31 @@ import HyruleDefenseSubject from "../projects/hyruleDefense/hyruleDefense.pdf";
 import HyruleDefenseHelpers from "../projects/hyruleDefense/sceaux.py?raw";
 import FilDariane from "../projects/filDariane/filDariane";
 import HyruleDefense from "../projects/hyruleDefense/hyruleDefense";
+import FeuTricoloreSubject from "../projects/feuTricolore/feuTricolore.pdf";
+import FeuTricoloreHelpers from "../projects/feuTricolore/carrefour.py?raw";
+import FeuTricolore from "../projects/feuTricolore/feuTricolore";
 import {
-  expectedHyruleAttack,
   explanationHyruleAttack,
-  goldenExpectedHyruleAttack,
   hintsHyruleAttack,
+  stepsHyruleAttack,
 } from "../projects/hyruleAttack/values";
 import {
   explanationHyruleDefense,
   hintsHyruleDefense,
+  stepsHyruleDefense,
 } from "../projects/hyruleDefense/values";
 import {
   explanationFilDariane,
   hintsFilDariane,
+  stepsFilDariane,
 } from "../projects/filDariane/values";
+import {
+  explanationFeuTricolore,
+  hintsFeuTricolore,
+  stepsFeuTricolore,
+} from "../projects/feuTricolore/values";
+import { stepsAppletonCalculator } from "../projects/appletonCalculator/values";
+import { checkAppleton } from "../projects/appletonCalculator/checks";
 
 export const DIFF = [
   "🥚 - Oeuf",
@@ -47,6 +58,7 @@ export const guidedProjects = [
     afterCode: "",
     explanation: explanationFilDariane,
     hints: hintsFilDariane,
+    steps: stepsFilDariane,
     difficulty: DIFF[2],
     hasEnd: true,
     component: FilDariane,
@@ -59,8 +71,10 @@ export const guidedProjects = [
     subject: AppletonSubject,
     beforeCode: "",
     afterCode: "",
+    steps: stepsAppletonCalculator,
+    checkHtml: checkAppleton,
     difficulty: DIFF[1],
-    hasEnd: false,
+    hasEnd: true,
   },
   {
     id: "hyrule-attack",
@@ -70,10 +84,9 @@ export const guidedProjects = [
     subject: HyruleAttackSubject,
     beforeCode: HyruleAttackHelpers,
     afterCode: HyruleAttackGrader,
-    expected: expectedHyruleAttack,
-    goldenExpected: goldenExpectedHyruleAttack,
     explanation: explanationHyruleAttack,
     hints: hintsHyruleAttack,
+    steps: stepsHyruleAttack,
     difficulty: DIFF[2],
     hasEnd: true,
   },
@@ -87,8 +100,24 @@ export const guidedProjects = [
     afterCode: "",
     explanation: explanationHyruleDefense,
     hints: hintsHyruleDefense,
+    steps: stepsHyruleDefense,
     difficulty: DIFF[3],
     hasEnd: true,
     component: HyruleDefense,
+  },
+  {
+    id: "feu-tricolore",
+    name: "Feu Tricolore",
+    language: "python",
+    description: "Programmez les feux du carrefour sans provoquer d'accident.",
+    subject: FeuTricoloreSubject,
+    beforeCode: FeuTricoloreHelpers,
+    afterCode: "_feu_end()",
+    explanation: explanationFeuTricolore,
+    hints: hintsFeuTricolore,
+    steps: stepsFeuTricolore,
+    difficulty: DIFF[0],
+    hasEnd: true,
+    component: FeuTricolore,
   },
 ];

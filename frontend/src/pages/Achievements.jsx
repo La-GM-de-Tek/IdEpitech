@@ -9,6 +9,44 @@ import {
   ACHIEVEMENT_CATEGORIES,
   checkAchievements,
 } from "../datas/achievements";
+import { REWARDS, useUnlockedRewards } from "../datas/rewards";
+
+function RewardCard({ reward, unlocked }) {
+  return (
+    <div
+      className={`flex items-center gap-4 rounded-2xl border bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)] ${
+        unlocked
+          ? "border-[color-mix(in_oklab,var(--accent)_40%,var(--border))]"
+          : "border-[var(--border)] opacity-60"
+      }`}
+    >
+      <span
+        className={`tile ${unlocked ? "" : "grayscale"}`}
+        style={{ "--tone": unlocked ? "var(--accent)" : "var(--text-faint)" }}
+        aria-hidden="true"
+      >
+        {reward.icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <h3 className="card-title">{reward.name}</h3>
+        <p className="mt-1 text-[0.8125rem] leading-relaxed text-[var(--text-muted)]">
+          {reward.condition}
+        </p>
+      </div>
+      {unlocked ? (
+        <span
+          className="check-dot"
+          style={{ "--tone": "var(--accent)" }}
+          title="Débloqué"
+        >
+          <Icon name="check" size={12} strokeWidth={3} />
+        </span>
+      ) : (
+        <span className="badge badge--quiet">🔒</span>
+      )}
+    </div>
+  );
+}
 
 function AchievementCard({ achievement, date }) {
   return (
@@ -59,6 +97,7 @@ function AchievementCard({ achievement, date }) {
 
 export function Achievements() {
   const [unlocked] = useState(checkAchievements);
+  const rewards = useUnlockedRewards();
   const countUnlocked = (list) =>
     list.filter((achievement) => unlocked[achievement.id]).length;
 
@@ -103,6 +142,22 @@ export function Achievements() {
             </section>
           );
         })}
+
+        <section className="mt-14">
+          <div className="mb-5 flex items-center gap-5">
+            <h2 className="section-title">Récompenses</h2>
+            <Progress done={rewards.size} total={REWARDS.length} />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {REWARDS.map((reward) => (
+              <RewardCard
+                key={reward.id}
+                reward={reward}
+                unlocked={rewards.has(reward.id)}
+              />
+            ))}
+          </div>
+        </section>
       </main>
     </PatternPage>
   );

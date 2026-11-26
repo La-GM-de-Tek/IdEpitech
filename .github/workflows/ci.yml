@@ -17,6 +17,8 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v5
+        with:
+          submodules: true
 
       - uses: actions/setup-node@v5
         with:
@@ -32,6 +34,27 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  pyodide:
+    name: Pyodide
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install Pyodide used by the worker
+        run: |
+          VERSION=$(sed -n 's/^const PYODIDE_VERSION = "\(.*\)";/\1/p' src/pyodide.worker.js)
+          npm install --no-save --no-package-lock "pyodide@$VERSION"
+
+      - name: Check worker init (micropip packages)
+        run: node scripts/check-pyodide.mjs
 
   backend:
     name: Backend
