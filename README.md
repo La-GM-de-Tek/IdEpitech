@@ -8,6 +8,7 @@ A learning IDE that runs **entirely in the browser** — no install, no account,
 - **Learning track** (`/learning`) — short exercises (print, variables, conditions, loops, lists, functions, pointers…) whose output is checked against an expected result. Progress is stored in `localStorage`.
 - **Guided projects** — bigger subjects shipped with a PDF statement, hints, and sometimes a custom visualiser (e.g. _Fil d'Ariane_ animates Theseus walking the maze your code solves).
 - **Glossary** (`/glossary`) — the vocabulary used across the exercises.
+- **Stats** (`/stats`) — XP, level, skills, streaks and activity, computed from `localStorage`. The page also calls `GET /api/stats` and prefers the backend's values when it answers (`VITE_API_URL` sets its origin).
 - **Interactive `input()`** — synchronous stdin, handled with `SharedArrayBuffer` + `Atomics`, so the UI never freezes.
 - **Themes** — switchable look and feel, light and dark.
 

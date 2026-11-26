@@ -40,6 +40,12 @@ const PATHS = {
     />
   ),
   stop: <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />,
+  pause: (
+    <>
+      <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+      <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+    </>
+  ),
   crosshair: (
     <>
       <circle cx="12" cy="12" r="8" />
@@ -150,6 +156,14 @@ const PATHS = {
       <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
       <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
       <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+    </>
+  ),
+  chart: (
+    <>
+      <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+      <path d="M8 17v-4" />
+      <path d="M13 17V8" />
+      <path d="M18 17V5" />
     </>
   ),
   alert: (

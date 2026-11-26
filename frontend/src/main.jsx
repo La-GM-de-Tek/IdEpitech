@@ -9,6 +9,8 @@ import { LearningPage } from "./pages/LearningPage.jsx";
 import { Glossary } from "./pages/Glossary.jsx";
 import { Agenda } from "./pages/Agenda.jsx";
 import { Achievements } from "./pages/Achievements.jsx";
+import { Stats } from "./pages/Stats.jsx";
+import { Profile } from "./pages/Profile.jsx";
 import { ThemeProvider } from "./theme/ThemeContext.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { applyThemeStyles } from "./theme/themes.jsx";
@@ -42,6 +44,8 @@ createRoot(document.getElementById("root")).render(
               <Route path="/glossary/:id?" element={<Glossary />} />
               <Route path="/agenda" element={<Agenda />} />
               <Route path="/achievements" element={<Achievements />} />
+              <Route path="/stats" element={<Stats />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </BrowserRouter>
         </ThemeBackground>
