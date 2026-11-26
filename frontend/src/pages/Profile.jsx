@@ -15,6 +15,7 @@ import {
   saveProfile,
 } from "../datas/profile";
 import { computeLocalStats, levelInfo, rankInfo } from "../datas/stats";
+import { lockedTargets, rewardFor, unlockedRewards } from "../datas/rewards";
 import { COBRA_DIFFICULTIES, DIFFICULTIES } from "../projects";
 import { useTheme } from "../theme/ThemeContext";
 import { StatTile } from "./Stats";
@@ -72,7 +73,11 @@ function Empty({ children }) {
 function AchievementItem({ achievement }) {
   return (
     <>
-      <span className="tile" style={{ "--tone": "var(--gold)" }} aria-hidden="true">
+      <span
+        className="tile"
+        style={{ "--tone": "var(--gold)" }}
+        aria-hidden="true"
+      >
         {achievement.icon}
       </span>
       <span className="min-w-0">
@@ -110,6 +115,7 @@ function IdentityCard({ user, view, stats, editing, onChange }) {
     language.runs > best.runs ? language : best,
   );
   const pseudo = view.pseudo || user.username;
+  const lockedAvatars = lockedTargets("avatar", unlockedRewards(stats));
 
   return (
     <section className="player-card">
@@ -141,24 +147,38 @@ function IdentityCard({ user, view, stats, editing, onChange }) {
               />
             </label>
             <div>
-              <p className="text-xs font-medium text-[var(--text-muted)]">Avatar</p>
+              <p className="text-xs font-medium text-[var(--text-muted)]">
+                Avatar
+              </p>
               <div className="mt-1 flex flex-wrap gap-1.5">
-                {[null, ...AVATARS].map((avatar) => (
-                  <button
-                    key={avatar ?? "rank"}
-                    type="button"
-                    aria-pressed={(view.avatar ?? null) === avatar}
-                    title={avatar ? undefined : "Icône du rang"}
-                    onClick={() => onChange({ avatar })}
-                    className={`grid h-9 w-9 place-items-center rounded-lg border text-lg transition ${
-                      (view.avatar ?? null) === avatar
-                        ? "border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)]"
-                        : "border-[var(--border)] hover:bg-[var(--surface-hover)]"
-                    }`}
-                  >
-                    {avatar ?? rank.icon}
-                  </button>
-                ))}
+                {[null, ...AVATARS].map((avatar) => {
+                  const locked = lockedAvatars.has(avatar);
+                  return (
+                    <button
+                      key={avatar ?? "rank"}
+                      type="button"
+                      aria-pressed={(view.avatar ?? null) === avatar}
+                      disabled={locked}
+                      title={
+                        locked
+                          ? `🔒 ${rewardFor("avatar", avatar).condition}`
+                          : avatar
+                            ? undefined
+                            : "Icône du rang"
+                      }
+                      onClick={() => onChange({ avatar })}
+                      className={`grid h-9 w-9 place-items-center rounded-lg border text-lg transition ${
+                        locked
+                          ? "cursor-not-allowed border-[var(--border)] opacity-40 grayscale"
+                          : (view.avatar ?? null) === avatar
+                            ? "border-[var(--accent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)]"
+                            : "border-[var(--border)] hover:bg-[var(--surface-hover)]"
+                      }`}
+                    >
+                      {avatar ?? rank.icon}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -169,7 +189,9 @@ function IdentityCard({ user, view, stats, editing, onChange }) {
             </p>
             <h2 className="player-rank truncate">{pseudo}</h2>
             {pseudo !== user.username && (
-              <p className="text-xs text-[var(--text-faint)]">@{user.username}</p>
+              <p className="text-xs text-[var(--text-faint)]">
+                @{user.username}
+              </p>
             )}
             {view.bio && (
               <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
@@ -266,7 +288,11 @@ function ProfileView({ user }) {
             </button>
           </>
         ) : (
-          <button type="button" className="btn btn-outline" onClick={startEditing}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={startEditing}
+          >
             Modifier
           </button>
         )}
@@ -292,7 +318,9 @@ function ProfileView({ user }) {
                 <Pickable
                   key={achievement.id}
                   selected={showcase.achievements.includes(achievement.id)}
-                  full={showcase.achievements.length >= PROFILE_LIMITS.achievements}
+                  full={
+                    showcase.achievements.length >= PROFILE_LIMITS.achievements
+                  }
                   onClick={() => toggle("achievements", achievement.id)}
                 >
                   <AchievementItem achievement={achievement} />
@@ -304,14 +332,16 @@ function ProfileView({ user }) {
           )
         ) : showcase.achievements.length ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {showcase.achievements.map(byId(ACHIEVEMENTS)).map((achievement) => (
-              <div
-                key={achievement.id}
-                className="flex items-center gap-4 rounded-2xl border border-[color-mix(in_oklab,var(--gold)_40%,var(--border))] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]"
-              >
-                <AchievementItem achievement={achievement} />
-              </div>
-            ))}
+            {showcase.achievements
+              .map(byId(ACHIEVEMENTS))
+              .map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className="flex items-center gap-4 rounded-2xl border border-[color-mix(in_oklab,var(--gold)_40%,var(--border))] bg-[var(--surface)] p-4 shadow-[var(--shadow-sm)]"
+                >
+                  <AchievementItem achievement={achievement} />
+                </div>
+              ))}
           </div>
         ) : (
           <Empty>Aucun succès en vitrine.</Empty>

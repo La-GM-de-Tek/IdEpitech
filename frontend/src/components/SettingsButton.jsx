@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTheme } from "../theme/ThemeContext";
 import { THEME_GROUPS, loadThemeFont } from "../theme/themes";
+import { lockedTargets, rewardFor, unlockedRewards } from "../datas/rewards";
 import Icon from "./Icon";
 
 function fontFamily(theme) {
@@ -10,15 +11,19 @@ function fontFamily(theme) {
     : "var(--font-sans)";
 }
 
-function ThemeSwatch({ theme, mode, selected, onSelect }) {
+function ThemeSwatch({ theme, mode, selected, locked, onSelect }) {
   const palette = theme.colors[mode];
   return (
     <button
       type="button"
       aria-pressed={selected}
+      disabled={locked}
+      title={locked ? `🔒 ${rewardFor("theme", theme.id).condition}` : undefined}
       onClick={onSelect}
       className={`group flex flex-col overflow-hidden rounded-2xl border text-left transition ${
-        selected
+        locked
+          ? "cursor-not-allowed border-[var(--border)] opacity-50 grayscale"
+          : selected
           ? "border-[var(--accent)] shadow-[0_0_0_3px_color-mix(in_oklab,var(--accent)_25%,transparent)]"
           : "border-[var(--border)] hover:border-[var(--border-strong)]"
       }`}
@@ -43,6 +48,11 @@ function ThemeSwatch({ theme, mode, selected, onSelect }) {
             ),
           )}
         </span>
+        {locked && (
+          <span className="absolute top-2 right-2 text-sm" aria-label="Verrouillé">
+            🔒
+          </span>
+        )}
         {selected && (
           <span className="absolute top-2 right-2 grid h-5 w-5 place-items-center rounded-full bg-[var(--accent)] text-[var(--accent-contrast)]">
             <Icon name="check" size={12} strokeWidth={3} />
@@ -61,6 +71,7 @@ function ThemeSwatch({ theme, mode, selected, onSelect }) {
 
 function SettingsModal({ onClose }) {
   const { themeId, setThemeId, themes, mode, setMode } = useTheme();
+  const [locked] = useState(() => lockedTargets("theme", unlockedRewards()));
 
   useEffect(() => {
     Object.values(themes).forEach(loadThemeFont);
@@ -143,6 +154,7 @@ function SettingsModal({ onClose }) {
                     theme={theme}
                     mode={mode}
                     selected={theme.id === themeId}
+                    locked={locked.has(theme.id)}
                     onSelect={() => setThemeId(theme.id)}
                   />
                 ))}
