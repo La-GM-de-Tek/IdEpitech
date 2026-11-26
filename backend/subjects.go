@@ -175,10 +175,6 @@ func (app *App) handleUpdateSubject(c *gin.Context) {
 			respondError(c, http.StatusBadRequest, "VALIDATION_ERROR", "Slug cannot be empty")
 			return
 		}
-		if _, convErr := strconv.ParseUint(slugText, 10, 64); convErr == nil {
-			respondError(c, http.StatusBadRequest, "VALIDATION_ERROR", "Slug cannot be purely numeric")
-			return
-		}
 		subject.Slug = slugText
 	}
 	if req.Langage != nil {
