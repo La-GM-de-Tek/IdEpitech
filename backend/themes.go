@@ -21,21 +21,27 @@ type grantThemeRequest struct {
 
 func (app *App) handleListThemes(c *gin.Context) {
 	var query pageQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleGetTheme(c *gin.Context) {
 	var uri themeURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleCreateTheme(c *gin.Context) {
 	var req themeRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -43,15 +49,21 @@ func (app *App) handleCreateTheme(c *gin.Context) {
 func (app *App) handleUpdateTheme(c *gin.Context) {
 	var uri themeURI
 	var req themeRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteTheme(c *gin.Context) {
 	var uri themeURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -64,15 +76,21 @@ func (app *App) handleListMyThemes(c *gin.Context) {
 func (app *App) handleGrantUserTheme(c *gin.Context) {
 	var uri userURI
 	var req grantThemeRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleRevokeUserTheme(c *gin.Context) {
 	var uri userThemeURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }

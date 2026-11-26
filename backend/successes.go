@@ -17,21 +17,27 @@ type unlockSuccessRequest struct {
 
 func (app *App) handleListSuccesses(c *gin.Context) {
 	var query pageQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleGetSuccess(c *gin.Context) {
 	var uri successURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleCreateSuccess(c *gin.Context) {
 	var req successRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -39,29 +45,39 @@ func (app *App) handleCreateSuccess(c *gin.Context) {
 func (app *App) handleUpdateSuccess(c *gin.Context) {
 	var uri successURI
 	var req successRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteSuccess(c *gin.Context) {
 	var uri successURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleListMySuccesses(c *gin.Context) {
 	var query pageQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleUnlockMySuccess(c *gin.Context) {
 	var req unlockSuccessRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -69,8 +85,12 @@ func (app *App) handleUnlockMySuccess(c *gin.Context) {
 func (app *App) handleListUserSuccesses(c *gin.Context) {
 	var uri userURI
 	var query pageQuery
-	bindURI(c, &uri)
-	bindQuery(c, &query)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }

@@ -59,35 +59,45 @@ func (app *App) handleMe(c *gin.Context) {
 
 func (app *App) handleUpdateMe(c *gin.Context) {
 	var req updateMeRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleUpdateMyPassword(c *gin.Context) {
 	var req updatePasswordRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteMe(c *gin.Context) {
 	var req deleteMeRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleListUsers(c *gin.Context) {
 	var query listUsersQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleGetUser(c *gin.Context) {
 	var uri userURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -95,15 +105,21 @@ func (app *App) handleGetUser(c *gin.Context) {
 func (app *App) handleUpdateUser(c *gin.Context) {
 	var uri userURI
 	var req updateUserRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteUser(c *gin.Context) {
 	var uri userURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
