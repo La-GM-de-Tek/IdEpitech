@@ -249,11 +249,11 @@ Pour un non-admin, `expected` est remplacé par `"has_expected": true` ou `false
 
 Crée un compte et renvoie un JWT.
 
-| Paramètre  | Où   | Type   | Requis | Description                        |
-| ---------- | ---- | ------ | :----: | ---------------------------------- |
-| `username` | body | string |   ✅   | 3–32 caractères, unique            |
-| `mail`     | body | string |   ✅   | Adresse valide, unique             |
-| `password` | body | string |   ✅   | 8 caractères min, stocké en bcrypt |
+| Paramètre  | Où   | Type   | Requis | Description                         |
+| ---------- | ---- | ------ | :----: | ----------------------------------- |
+| `username` | body | string |   ✅   | 3–32 caractères, unique             |
+| `mail`     | body | string |   ✅   | Adresse valide, unique              |
+| `password` | body | string |   ✅   | 8 à 72 caractères, stocké en bcrypt |
 
 **201**
 
@@ -309,7 +309,7 @@ Tous les champs sont optionnels, au moins un est requis.
 | Paramètre          | Où   | Type   | Requis | Description |
 | ------------------ | ---- | ------ | :----: | ----------- |
 | `current_password` | body | string |   ✅   |             |
-| `new_password`     | body | string |   ✅   | 8 char min  |
+| `new_password`     | body | string |   ✅   | 8 à 72 char |
 
 **204**. Erreurs : `400`, `401` (mot de passe actuel faux).
 
