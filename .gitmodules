@@ -1,0 +1,3 @@
+[submodule "frontend/src/projects"]
+	path = frontend/src/projects
+	url = https://github.com/La-GM-de-Tek/IdEpitech-projects.git

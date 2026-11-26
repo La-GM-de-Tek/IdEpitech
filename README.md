@@ -45,8 +45,10 @@ Projects are declared in [src/projects.jsx](src/projects.jsx). Adding one is a c
    - `learningPythonProjects` / `learningCProjects` — short, auto-checked exercises.
    - `guidedProjects` — a full subject with a PDF, shown on the home page.
 2. Add an entry
-3. Put your assets in `src/projects/<myProject>/` (statement `.md`, `.pdf`, images, helper `.py` imported with `?raw`). Follow the layout of [src/projects/filDariane/](src/projects/filDariane/).
+3. Put your assets in `src/projects/<myProject>/` (statement `.md`, `.pdf`, images, helper `.py` imported with `?raw`). Follow the layout of `filDariane/`.
 4. Need a custom visualiser instead of the plain console? Add a `<myProject>.jsx` component next to the assets, like `filDariane.jsx`.
+
+`frontend/src/projects/` is a git submodule pointing to [La-GM-de-Tek/IdEpitech-projects](https://github.com/La-GM-de-Tek/IdEpitech-projects). Clone with `git clone --recurse-submodules`, or run `git submodule update --init` on an existing clone. Project files go through a PR on that repo (see its [CONTRIBUTING.md](https://github.com/La-GM-de-Tek/IdEpitech-projects/blob/main/CONTRIBUTING.md)); the declaration in step 2 and the submodule bump go through a PR here.
 5. Run `npm run dev`, check your exercise passes with a correct solution **and** fails with a wrong one.
 
 ### Pull request flow
