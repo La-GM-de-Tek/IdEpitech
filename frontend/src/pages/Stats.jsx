@@ -305,7 +305,7 @@ export function Stats() {
           <StatTile
             icon="🏅"
             label="Bonus dorés"
-            value={`${projects.gold}/${projects.total}`}
+            value={`${projects.gold}/${projects.goldTotal ?? projects.total}`}
           />
           <StatTile
             icon="🏆"

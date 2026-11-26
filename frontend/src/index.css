@@ -211,6 +211,85 @@ textarea {
     color: color-mix(in oklab, var(--tone) var(--tone-mix), var(--text));
   }
 
+  .step-pill {
+    --tone: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    height: 1.75rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+    cursor: pointer;
+    transition:
+      background-color 150ms ease-out,
+      box-shadow 150ms ease-out,
+      color 150ms ease-out,
+      padding 220ms ease-out;
+  }
+  .step-pill:hover {
+    background-color: var(--surface-hover);
+  }
+  .step-pill[aria-pressed="true"] {
+    padding-right: 0.625rem;
+    color: var(--text);
+    box-shadow: inset 0 0 0 1.5px
+      color-mix(in oklab, var(--tone) 70%, transparent);
+  }
+  .step-pill[data-state="passed"] {
+    --tone: var(--success);
+  }
+  .step-pill[data-bonus] {
+    --tone: var(--gold);
+  }
+  .step-pill[data-state="locked"] {
+    --tone: var(--text-faint);
+    color: var(--text-faint);
+  }
+  .step-pill-mark {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: color-mix(in oklab, var(--tone) 18%, transparent);
+    color: color-mix(in oklab, var(--tone) var(--tone-mix), var(--text));
+  }
+  .step-pill[data-state="current"] .step-pill-mark {
+    background: var(--tone);
+    color: var(--bg);
+  }
+  /* Folded: only the number. Unfolded: the title slides out next to it. */
+  .step-pill-title {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition:
+      max-width 220ms ease-out,
+      margin 220ms ease-out,
+      opacity 150ms ease-out;
+  }
+  .step-pill[aria-pressed="true"] .step-pill-title {
+    max-width: 14rem;
+    margin-left: 0.4rem;
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .step-pill,
+    .step-pill-title {
+      transition: none;
+    }
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;

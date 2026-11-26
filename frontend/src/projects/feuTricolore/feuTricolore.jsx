@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { saveCompletion } from "../../completion";
+import { StepLocked } from "../../components/StepTracker";
+import { passSteps, useStepGate } from "../../steps";
 import Icon from "../../components/Icon";
 import carrefour from "./carrefour.py?raw";
 const APPROACH = 70;
@@ -224,11 +225,15 @@ export default function FeuTricolore({ lines, status, onClear, project }) {
   const result = data?.result ?? null;
   const level = data?.level ?? null;
 
+  const gate = useStepGate(project, level ? `niveau-${level}` : null);
+  const locked = gate.blocker != null;
+
   useEffect(() => {
-    if (!ended || !result?.ok) return;
-    if (level === 4) saveCompletion(project.id, false);
-    if (level === 5) saveCompletion(project.id, Boolean(result.gold));
-  }, [ended, result, level, project.id]);
+    if (!ended || !result?.ok || !gate.step) return;
+    // The rush-hour bonus counts only under the golden time.
+    if (gate.step.bonus && !result.gold) return;
+    passSteps(project, [gate.step.id]);
+  }, [ended, result, gate.step, project]);
 
   const replay = () => setReplays((count) => count + 1);
 
@@ -267,7 +272,7 @@ export default function FeuTricolore({ lines, status, onClear, project }) {
           )}
         </span>
         <div className="flex items-center gap-2">
-          {data && (
+          {data && !locked && (
             <>
               <div
                 className="flex items-center gap-1"
@@ -329,6 +334,8 @@ export default function FeuTricolore({ lines, status, onClear, project }) {
               {error}
             </pre>
           </div>
+        ) : data && locked ? (
+          <StepLocked step={gate.step} blocker={gate.blocker} />
         ) : data ? (
           <div ref={hostRef} className="flex min-h-0 flex-1 flex-col gap-3">
             <Stage

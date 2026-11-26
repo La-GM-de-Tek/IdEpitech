@@ -227,6 +227,9 @@ export function computeLocalStats() {
       done: doneProjects.length,
       total: countableProjects.length,
       gold: goldProjects.length,
+      goldTotal: countableProjects.filter(
+        ({ steps }) => !steps || steps.some((step) => step.bonus),
+      ).length,
       noHint: doneProjects.filter(({ id }) => hintsUsed(id) === 0).length,
     },
     achievements: {

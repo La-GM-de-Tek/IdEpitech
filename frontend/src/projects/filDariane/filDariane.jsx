@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { saveCompletion } from "../../completion";
+import { StepLocked } from "../../components/StepTracker";
+import { passSteps, useStepGate } from "../../steps";
+import dedale from "./dedale.py?raw";
 import Icon from "../../components/Icon";
 import { MOVES, createLabyrinth } from "./labyrinth";
 
@@ -32,6 +34,22 @@ const LEGEND = [
       "h-2.5 w-2.5 rounded-[3px] bg-[var(--success)] shadow-[0_0_6px_var(--success)]",
   },
 ];
+
+// The maps of dedale.py, keyed by their text: the grid printed when a map is
+// loaded tells which one the run uses.
+const MAPS = new Map(
+  [...dedale.matchAll(/^(\w+) = """([\s\S]*?)"""/gm)].map(([, name, text]) => [
+    text
+      .split("\n")
+      .map((line) => line.trimEnd())
+      .join("\n"),
+    name,
+  ]),
+);
+
+function mapName(grid) {
+  return MAPS.get(grid.map((row) => row.join("")).join("\n")) ?? null;
+}
 
 function extractFirstList(text) {
   const start = text.indexOf("[");
@@ -117,7 +135,7 @@ export function parseRun(lines) {
   )
     victory = true;
 
-  return { grid, start, moves, outcome, victory };
+  return { grid, start, moves, outcome, victory, map: mapName(grid) };
 }
 
 const CAMERAS = [
@@ -262,11 +280,14 @@ export default function FilDariane({ lines, status, onClear, project }) {
   const finished = Boolean(run) && finishedRun === run;
   const outcome = finished ? run.outcome : null;
 
+  const stepId = project.steps?.find((step) => step.map === run?.map)?.id;
+  const gate = useStepGate(project, stepId ?? null);
+  const locked = gate.blocker != null;
+
   useEffect(() => {
-    if (!finished) return;
-    if (run.victory) saveCompletion(project.id, true);
-    else if (run.outcome === "won") saveCompletion(project.id, false);
-  }, [finished, run]);
+    if (finished && run.outcome === "won" && gate.step)
+      passSteps(project, [gate.step.id]);
+  }, [finished, run, gate.step, project]);
 
   useEffect(() => setCamera(defaultCamera()), [run]);
 
@@ -281,7 +302,7 @@ export default function FilDariane({ lines, status, onClear, project }) {
       <div className="panel-head">
         <span className="panel-title">
           LABYRINTHE
-          {run && (
+          {run && !locked && (
             <span className="font-medium tracking-normal normal-case tabular-nums text-[var(--text-faint)]">
               <span ref={counterRef} /> pas
             </span>
@@ -305,7 +326,7 @@ export default function FilDariane({ lines, status, onClear, project }) {
               {delay} ms
             </span>
           </label>
-          {run && (
+          {run && !locked && (
             <button onClick={replay} className="btn btn-ghost btn-sm">
               <Icon name="replay" size={12} />
               Rejouer
@@ -340,6 +361,8 @@ export default function FilDariane({ lines, status, onClear, project }) {
               {error}
             </pre>
           </div>
+        ) : run && locked ? (
+          <StepLocked step={gate.step} blocker={gate.blocker} />
         ) : run ? (
           <div ref={hostRef} className="flex min-h-0 flex-1 flex-col gap-4">
             <Labyrinth3DStage

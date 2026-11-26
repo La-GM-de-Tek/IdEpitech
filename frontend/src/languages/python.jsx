@@ -3,6 +3,31 @@ import Console from "../components/Console";
 import LearningConsole from "../components/LearningConsole";
 import { usePyodide } from "../usePyodide";
 import { saveCompletion } from "../completion";
+import { getStepProgress, stepName, validateSteps } from "../steps";
+
+// Console feedback after a run of a subject split into parts.
+function reportSteps(project, { passed, failed }, appendOutput) {
+  let good = "";
+  for (const step of passed) {
+    good += step.bonus
+      ? `✨ Bonus validé : ${step.title}. Vous décrochez la marque dorée !\n`
+      : `✓ ${stepName(project, step)} validée : ${step.title}\n`;
+  }
+  if (passed.some((step) => !step.bonus) && getStepProgress(project).completed)
+    good += "Sujet validé ! Tu peux passer à la suite.\n";
+  if (!failed && passed.length === 0)
+    good += "Toutes les étapes sont déjà validées.\n";
+  if (failed?.bonus)
+    good += `Bonus (${failed.title}) : pas encore, il est facultatif.\n`;
+  if (good) appendOutput({ stream: "result", text: `\n${good}` });
+
+  if (failed && !failed.bonus) {
+    appendOutput({
+      stream: "stderr",
+      text: `${good ? "" : "\n"}${stepName(project, failed)} (${failed.title}) : pas encore (et c'est ok), réessaie.\n`,
+    });
+  }
+}
 
 export const SAMPLE_PYTHON = `# Welcome to Manta Editor
 
@@ -62,7 +87,14 @@ export function usePythonLanguage({ onRequestPanel, project, onNext }) {
         appendOutput({ stream: "result", text: `=> ${res.result}\n` });
       }
 
-      if (project.expected != null || project.goldenExpected != null) {
+      if (project.steps?.every((step) => step.check)) {
+        const out = stdoutRef.current.trim();
+        reportSteps(
+          project,
+          validateSteps(project, (step) => step.check(out)),
+          appendOutput,
+        );
+      } else if (project.expected != null || project.goldenExpected != null) {
         const out = stdoutRef.current.trim();
         const gold =
           project.goldenExpected != null &&

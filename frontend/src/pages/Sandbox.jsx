@@ -7,9 +7,11 @@ import { usePythonLanguage, SAMPLE_PYTHON } from "../languages/python";
 import { useHtmlLanguage, SAMPLE_HTML } from "../languages/html";
 import { useCLanguage, SAMPLE_C } from "../languages/c";
 import Hints from "../components/Hints";
+import StepTracker from "../components/StepTracker";
 import Icon from "../components/Icon";
 import { completionMark } from "../completion";
 import { trackRun, trackTime } from "../activity";
+import { useStepProgress } from "../steps";
 import { Glossary } from "./Glossary";
 
 const STORAGE_KEY = "manta-code-";
@@ -63,6 +65,16 @@ export default function Sandbox({ project, onBack, onNext }) {
   );
   const [editorWidth, setEditorWidth] = useState(50);
   const [panel, setPanel] = useState(project.subject ? "subject" : "glossary");
+  const progress = useStepProgress(project);
+  const [pickedStepId, setPickedStepId] = useState(null);
+  const currentStepId = progress?.current?.id;
+  // Follow the student: once a part is passed, show the next one again.
+  useEffect(() => setPickedStepId(null), [currentStepId]);
+  const shownStep = progress
+    ? (progress.steps.find(({ id }) => id === pickedStepId) ??
+      progress.current ??
+      progress.steps.at(-1))
+    : null;
   const runRef = useRef(null);
   const nextRef = useRef(null);
   const splitRef = useRef(null);
@@ -216,6 +228,13 @@ export default function Sandbox({ project, onBack, onNext }) {
           className="split-handle hidden md:block"
         />
         <section className="flex min-h-0 min-w-0 flex-col md:flex-1">
+          {progress && (
+            <StepTracker
+              progress={progress}
+              selected={shownStep}
+              onSelect={setPickedStepId}
+            />
+          )}
           <div className="tabs" role="tablist">
             {project.subject && (
               <button
@@ -257,7 +276,11 @@ export default function Sandbox({ project, onBack, onNext }) {
           {panel === "console" && renderPanel()}
         </section>
       </main>
-      <Hints project={project} />
+      <Hints
+        key={shownStep?.id}
+        project={project}
+        step={shownStep ?? undefined}
+      />
     </div>
   );
 }

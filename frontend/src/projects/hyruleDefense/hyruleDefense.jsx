@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { saveCompletion } from "../../completion";
+import { StepLocked } from "../../components/StepTracker";
+import { passSteps, useStepGate } from "../../steps";
 import Icon from "../../components/Icon";
 import sceaux from "./sceaux.py?raw";
 
@@ -331,9 +332,17 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
     [grid, fault, solved, victory, golden],
   );
 
+  const gate = useStepGate(project, difficulty);
+  const locked = gate.blocker != null;
+
   useEffect(() => {
-    if (victory) saveCompletion(project.id, golden);
-  }, [victory, golden, project.id]);
+    if (!atEnd || !solved || !gate.step) return;
+    const ids = [gate.step.id];
+    // The bonus follows the hard seal, restored without the helpers.
+    const bonus = project.steps.find((step) => step.bonus);
+    if (golden && bonus) ids.push(bonus.id);
+    passSteps(project, ids);
+  }, [atEnd, solved, golden, gate.step, project]);
 
   const replay = () => {
     setStep(0);
@@ -348,7 +357,9 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
       text:
         difficulty === "difficile"
           ? "Le sceau le plus difficile est restauré ! Hyrule est sauvée."
-          : "Sceau restauré ! Tentez maintenant le sceau difficile pour terminer.",
+          : difficulty === "facile"
+            ? "Sceau restauré ! Tentez maintenant le sceau moyen."
+            : "Sceau restauré ! Tentez maintenant le sceau difficile pour terminer.",
     };
   } else if (atEnd && fault) {
     banner = {
@@ -371,7 +382,7 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
       <div className="panel-head">
         <span className="panel-title whitespace-nowrap">
           SCEAU SHEIKAH
-          {grid && (
+          {grid && !locked && (
             <span className="font-medium tracking-normal normal-case tabular-nums text-[var(--text-faint)]">
               {[
                 difficulty,
@@ -398,7 +409,7 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
               className="h-1 w-24 cursor-pointer accent-[var(--accent)]"
             />
           </label>
-          {grid && (
+          {grid && !locked && (
             <button onClick={replay} className="btn btn-ghost btn-sm">
               <Icon name="replay" size={12} />
               Rejouer
@@ -433,6 +444,8 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
               {error}
             </pre>
           </div>
+        ) : grid && locked ? (
+          <StepLocked step={gate.step} blocker={gate.blocker} />
         ) : grid ? (
           <div ref={hostRef} className="flex min-h-0 flex-1 flex-col gap-4">
             <Seal3DStage

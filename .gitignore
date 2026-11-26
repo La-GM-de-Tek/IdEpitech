@@ -4,3 +4,4 @@ dist/
 **/.venv/
 .env
 backend/backend
+graphify-out/
