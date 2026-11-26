@@ -39,6 +39,9 @@ func main() {
 	if err := db.AutoMigrate(models...); err != nil {
 		log.Fatalf("db migrate: %v", err)
 	}
+	if err := seedThemes(db); err != nil {
+		log.Fatalf("db seed themes: %v", err)
+	}
 
 	app := &App{db: db, jwtSecret: []byte(secret)}
 

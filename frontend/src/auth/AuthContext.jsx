@@ -61,7 +61,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout }),
+    () => ({
+      user,
+      token: user ? localStorage.getItem(TOKEN_KEY) : null,
+      loading,
+      login,
+      register,
+      logout,
+    }),
     [user, loading, login, register, logout],
   );
 
