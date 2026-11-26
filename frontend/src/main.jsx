@@ -15,6 +15,7 @@ import { ThemeProvider } from "./theme/ThemeContext.jsx";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { applyThemeStyles } from "./theme/themes.jsx";
 import ThemeBackground from "./components/ThemeBackground.jsx";
+import ThemeGuard from "./components/ThemeGuard.jsx";
 
 applyThemeStyles();
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
+        <ThemeGuard />
         <ThemeBackground>
           <BrowserRouter>
             <Routes>
