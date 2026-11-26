@@ -230,7 +230,6 @@ export default function FeuTricolore({ lines, status, onClear, project }) {
 
   useEffect(() => {
     if (!ended || !result?.ok || !gate.step) return;
-    // The rush-hour bonus counts only under the golden time.
     if (gate.step.bonus && !result.gold) return;
     passSteps(project, [gate.step.id]);
   }, [ended, result, gate.step, project]);

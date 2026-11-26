@@ -338,7 +338,6 @@ export default function HyruleDefense({ lines, status, onClear, project }) {
   useEffect(() => {
     if (!atEnd || !solved || !gate.step) return;
     const ids = [gate.step.id];
-    // The bonus follows the hard seal, restored without the helpers.
     const bonus = project.steps.find((step) => step.bonus);
     if (golden && bonus) ids.push(bonus.id);
     passSteps(project, ids);

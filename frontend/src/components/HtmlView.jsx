@@ -1,8 +1,6 @@
 import Icon from "./Icon";
 import { getStepProgress, stepName } from "../steps";
 
-// What the automatic checks found on the last run: the parts it validated,
-// then the criteria of the first part that is not passed yet.
 function CheckReport({ project, report }) {
   if (report.running) {
     return (

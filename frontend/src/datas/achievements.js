@@ -19,7 +19,6 @@ const cIds = toIds(learningCProjects);
 const learningIds = [...pythonIds, ...cIds];
 const countableProjects = guidedProjects.filter((project) => project.hasEnd);
 const projectIds = toIds(countableProjects);
-// Only subjects with a bonus part can earn the golden mark.
 const goldableIds = toIds(
   countableProjects.filter(
     (project) => !project.steps || project.steps.some((step) => step.bonus),

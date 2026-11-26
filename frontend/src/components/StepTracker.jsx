@@ -1,7 +1,6 @@
 import Icon from "./Icon";
 import Progress from "./Progress";
 
-// "Étape" is feminine, "Bonus" masculine.
 const agree = (step, word) => (step.bonus ? word : `${word}e`);
 
 function stateLabel(step) {
@@ -10,8 +9,6 @@ function stateLabel(step) {
   return "en cours";
 }
 
-// An accordion: every step shows its number, the selected one (the current
-// step unless the student picks another) unfolds to show its title too.
 export default function StepTracker({ progress, selected, onSelect }) {
   return (
     <div className="flex flex-none items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-3 py-2">
@@ -61,8 +58,6 @@ export default function StepTracker({ progress, selected, onSelect }) {
   );
 }
 
-// Shown by a visualiser in place of the run when the student plays a step
-// that is still locked.
 export function StepLocked({ step, blocker }) {
   return (
     <div

@@ -11,7 +11,6 @@ export const hintsFeuTricolore = [
   "Va demander à un Manta quel est le pire carrefour de sa ville, et comment il le reprogrammerait.",
 ];
 
-// One part per level of carrefour.py: the visualiser passes `niveau-<n>`.
 export const stepsFeuTricolore = [
   {
     id: "niveau-1",

@@ -17,7 +17,6 @@ export const SAMPLE_HTML = `<!DOCTYPE html>
 
 export function useHtmlLanguage({ onRequestPanel, project }) {
   const [preview, setPreview] = useState("");
-  // Result of project.checkHtml for the last run, for subjects with parts.
   const [report, setReport] = useState(null);
   const lastRun = useRef(0);
 

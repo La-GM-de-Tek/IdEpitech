@@ -4,8 +4,6 @@ import Icon from "./Icon";
 const COOLDOWN_MS = 60 * 60 * 1000;
 const STORAGE_KEY = "manta-hints-";
 
-// { count, last, steps? }: count is the total unlocked on the project (read by
-// the stats and achievements), steps the count unlocked in each part.
 function loadState(id) {
   try {
     return (
@@ -19,8 +17,6 @@ function loadState(id) {
   }
 }
 
-// Saves from before the parts only hold a total. A part's hints are a slice
-// of the project's list, in order, so the total maps onto them.
 function unlockedPerStep(project, state) {
   if (state.steps) return state.steps;
   let left = state.count;
@@ -33,7 +29,6 @@ function unlockedPerStep(project, state) {
   );
 }
 
-// `step` is the part shown in the tracker, for projects split into parts.
 export default function Hints({ project, step }) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState(() => loadState(project.id));

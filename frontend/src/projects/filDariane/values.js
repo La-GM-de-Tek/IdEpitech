@@ -8,7 +8,6 @@ export const hintsFilDariane = [
   "Lèves toi va voir un manta pour lui dire ton top 3 spotify.",
 ];
 
-// One part per map of dedale.py: the visualiser recognises the map loaded.
 export const stepsFilDariane = [
   {
     id: "premier-couloir",

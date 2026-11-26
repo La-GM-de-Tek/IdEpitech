@@ -266,7 +266,6 @@ textarea {
     background: var(--tone);
     color: var(--bg);
   }
-  /* Folded: only the number. Unfolded: the title slides out next to it. */
   .step-pill-title {
     max-width: 0;
     overflow: hidden;

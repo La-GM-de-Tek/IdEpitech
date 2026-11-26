@@ -12,10 +12,6 @@ export const hintsHyruleAttack = [
 const SEAL_LINE =
   /^sceau n°(\d+) ==> obtenu: (?:True|False), attendu: (?:True|False)\. (Réussi|Raté) !$/;
 
-// The grader prints one line per seal, then its verdict:
-// SCELLE (a seal is misjudged), OUVERT (all judged), MAITRISE (all judged
-// without getLine, getColumn nor getBlock). The student's own print() come
-// before, so the last grader lines win.
 function graderReport(out) {
   const seals = new Map();
   let verdict = null;

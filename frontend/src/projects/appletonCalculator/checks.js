@@ -1,14 +1,7 @@
-// Automatic checks for the Appleton calculator, one list of criteria per
-// part. Each scenario loads the student's page in its own hidden frame,
-// sandboxed with scripts only (no access to this page), so every scenario
-// starts from a fresh calculator.
-
 const TIMEOUT_MS = 4000;
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const OPERATORS = ["+", "-", "×", "÷"];
 
-// Runs inside the test frame, after the student's code. It is serialised with
-// toString(), so it must stay self-contained.
 function harness(scenario, token) {
   const DIGIT_KEYS = "0123456789".split("");
   const OPERATOR_KEYS = ["+", "-", "×", "÷"];
@@ -27,8 +20,6 @@ function harness(scenario, token) {
   const SCREEN_NAME = /screen|display|[ée]cran|result|affich|output/i;
   const SKIPPED = ["SCRIPT", "STYLE", "TEMPLATE", "NOSCRIPT"];
 
-  // Lets the page react to a click. Not a timer: Chrome slows timers down to
-  // about one per second in hidden cross-origin frames like this one.
   const settle = () =>
     new Promise((resolve) => {
       const channel = new MessageChannel();
@@ -50,7 +41,6 @@ function harness(scenario, token) {
       (el) => !SKIPPED.includes(el.tagName),
     );
 
-  // One element per key, found by its label: "7", "+", "AC"…
   function findButtons() {
     const candidates = new Map();
     for (const el of elements()) {
@@ -62,8 +52,6 @@ function harness(scenario, token) {
       if (!candidates.has(key)) candidates.set(key, []);
       candidates.get(key).push(el);
     }
-    // Most keys share one tag: with the names, it tells the 0 key apart from
-    // a screen showing 0. On a tie the last one wins, screens come first.
     const tags = new Map();
     for (const list of candidates.values())
       for (const el of list)
@@ -107,7 +95,6 @@ function harness(scenario, token) {
     );
   }
 
-  // Clicks a key and returns the element whose text changed, the deepest one.
   async function pressAndWatch(buttons, key) {
     const before = new Map(
       outsideButtons(buttons).map((el) => [el, textOf(el)]),
@@ -131,7 +118,6 @@ function harness(scenario, token) {
     return Array.from(ctx.getImageData(0, 0, 1, 1).data);
   }
 
-  // The colour seen behind the keys: the first opaque background around them.
   function backdrop(keys) {
     let el = keys[0];
     while (el && !keys.every((key) => el.contains(key))) el = el.parentElement;
@@ -142,7 +128,6 @@ function harness(scenario, token) {
     return [255, 255, 255, 255];
   }
 
-  // Corner radius over the smaller side: 0.5 is a circle or a pill.
   function roundness(el) {
     const rect = el.getBoundingClientRect();
     const side = Math.min(rect.width, rect.height);
@@ -176,7 +161,6 @@ function harness(scenario, token) {
       ),
       screen: Boolean(findScreen(buttons)),
     };
-    // No screen found by its look: a key that changes some text shows one.
     if (!page.screen && buttons["7"])
       page.screen = Boolean(await pressAndWatch(buttons, "7"));
     return page;
@@ -301,14 +285,12 @@ const listMissing = (keys, wanted) => {
   return missing.length ? `il manque : ${missing.join(", ")}` : undefined;
 };
 
-// What the screen showed, for the student.
 function shown(text) {
   if (text == null) return "aucun écran n'a changé";
   if (text === "") return "l'écran est vide";
   return `l'écran affiche « ${text} »`;
 }
 
-// Why a scenario could not be played, or null.
 function broken(result) {
   if (result.error === "timeout")
     return "la page ne répond pas (balise mal fermée, boucle infinie ?)";
@@ -329,7 +311,6 @@ function screenIs(result, index, expected) {
   return { ok, detail: ok ? undefined : shown(text) };
 }
 
-// { [stepId]: [{ label, ok, detail? }] }, for the steps of values.js.
 export async function checkAppleton(html) {
   const results = Object.fromEntries(
     await Promise.all(

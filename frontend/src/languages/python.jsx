@@ -5,7 +5,6 @@ import { usePyodide } from "../usePyodide";
 import { saveCompletion } from "../completion";
 import { getStepProgress, stepName, validateSteps } from "../steps";
 
-// Console feedback after a run of a subject split into parts.
 function reportSteps(project, { passed, failed }, appendOutput) {
   let good = "";
   for (const step of passed) {

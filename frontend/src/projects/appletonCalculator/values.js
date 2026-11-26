@@ -1,5 +1,3 @@
-// The five steps of the statement. checks.js returns the criteria of each
-// part under the same ids.
 export const stepsAppletonCalculator = [
   {
     id: "interface",

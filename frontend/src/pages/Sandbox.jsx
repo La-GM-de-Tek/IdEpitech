@@ -68,7 +68,6 @@ export default function Sandbox({ project, onBack, onNext }) {
   const progress = useStepProgress(project);
   const [pickedStepId, setPickedStepId] = useState(null);
   const currentStepId = progress?.current?.id;
-  // Follow the student: once a part is passed, show the next one again.
   useEffect(() => setPickedStepId(null), [currentStepId]);
   const shownStep = progress
     ? (progress.steps.find(({ id }) => id === pickedStepId) ??

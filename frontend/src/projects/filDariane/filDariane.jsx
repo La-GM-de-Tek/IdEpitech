@@ -35,8 +35,6 @@ const LEGEND = [
   },
 ];
 
-// The maps of dedale.py, keyed by their text: the grid printed when a map is
-// loaded tells which one the run uses.
 const MAPS = new Map(
   [...dedale.matchAll(/^(\w+) = """([\s\S]*?)"""/gm)].map(([, name, text]) => [
     text

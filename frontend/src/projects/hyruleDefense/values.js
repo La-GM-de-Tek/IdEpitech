@@ -9,8 +9,6 @@ export const hintsHyruleDefense = [
   "Hyrule est sauvée ! Allez demander à un Manta, l'air de rien, son personnage préféré de jeux vidéo.",
 ];
 
-// One part per seal of sceaux.py: the visualiser passes the difficulty it
-// read ("facile", "moyen", "difficile"), then the bonus.
 export const stepsHyruleDefense = [
   {
     id: "facile",
