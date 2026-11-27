@@ -39,7 +39,9 @@ type authResponse struct {
 
 func (app *App) handleRegister(c *gin.Context) {
 	var req registerRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	if !formatRegisterRequest(c, &req) {
 		return
 	}
@@ -72,7 +74,9 @@ func (app *App) handleRegister(c *gin.Context) {
 
 func (app *App) handleLogin(c *gin.Context) {
 	var req loginRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	if !formatLoginRequest(c, &req) {
 		return
 	}

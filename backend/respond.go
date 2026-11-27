@@ -40,7 +40,7 @@ func respondNotImplemented(c *gin.Context) {
 
 func bindURI(c *gin.Context, req any) bool {
 	if err := c.ShouldBindUri(req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid uri parameters"})
+		respondError(c, http.StatusBadRequest, "VALIDATION_ERROR", "invalid uri parameters")
 		return false
 	}
 	return true
@@ -48,7 +48,7 @@ func bindURI(c *gin.Context, req any) bool {
 
 func bindQuery(c *gin.Context, req any) bool {
 	if err := c.ShouldBindQuery(req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid query parameters"})
+		respondError(c, http.StatusBadRequest, "VALIDATION_ERROR", "invalid query parameters")
 		return false
 	}
 	return true
@@ -56,7 +56,7 @@ func bindQuery(c *gin.Context, req any) bool {
 
 func bindBody(c *gin.Context, req any) bool {
 	if err := c.ShouldBind(req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		respondError(c, http.StatusBadRequest, "VALIDATION_ERROR", "invalid request body")
 		return false
 	}
 	return true
