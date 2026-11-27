@@ -396,16 +396,16 @@ Un visiteur ne voit que les sujets publiés. Un admin voit tout et peut filtrer 
 
 Crée le sujet, éventuellement avec ses étapes en une seule requête.
 
-| Paramètre        | Où   | Type    | Requis | Description                                                           |
-| ---------------- | ---- | ------- | :----: | --------------------------------------------------------------------- |
-| `name`           | body | string  |   ✅   | Nom affiché (`Fil d'Ariane`)                                          |
+| Paramètre        | Où   | Type    | Requis | Description                                                                   |
+| ---------------- | ---- | ------- | :----: | ----------------------------------------------------------------------------- |
+| `name`           | body | string  |   ✅   | Nom affiché (`Fil d'Ariane`)                                                  |
 | `slug`           | body | string  |   ❌   | Unique, généré depuis `name` si absent, normalisé (`Mon Sujet` → `mon-sujet`) |
-| `langage`        | body | integer |   ✅   | `id` d'un `Language`                                                  |
-| `description`    | body | string  |   ❌   |                                                                       |
-| `difficulty`     | body | integer |   ✅   | `0` à `3`                                                             |
-| `component_path` | body | string  |   ❌   | Clé d'un visualiseur existant du front                                |
-| `published`      | body | boolean |   ❌   | Défaut `false`                                                        |
-| `steps`          | body | array   |   ❌   | Liste de `Step` sans `id` ni `position` (l'ordre du tableau fait foi) |
+| `langage`        | body | integer |   ✅   | `id` d'un `Language`                                                          |
+| `description`    | body | string  |   ❌   |                                                                               |
+| `difficulty`     | body | integer |   ✅   | `0` à `3`                                                                     |
+| `component_path` | body | string  |   ❌   | Clé d'un visualiseur existant du front                                        |
+| `published`      | body | boolean |   ❌   | Défaut `false`                                                                |
+| `steps`          | body | array   |   ❌   | Liste de `Step` sans `id` ni `position` (l'ordre du tableau fait foi)         |
 
 Le PDF s'envoie ensuite avec `PUT /subjects/{id}/pdf`.
 

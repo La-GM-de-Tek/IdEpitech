@@ -32,7 +32,6 @@ func createTestLanguage(t *testing.T, app *App) Language {
 	return language
 }
 
-// cleanupSubjects deletes, at the end of the test, every subject whose slug starts with prefix.
 func cleanupSubjects(t *testing.T, app *App, prefix string) {
 	t.Helper()
 	t.Cleanup(func() {
@@ -54,7 +53,6 @@ func decodeSubject(t *testing.T, w *httptest.ResponseRecorder) Subject {
 	return subject
 }
 
-// newSubjectTest returns an admin token, a language and a unique name whose slug is the cleanup prefix.
 func newSubjectTest(t *testing.T) (*App, *gin.Engine, string, Language, string) {
 	t.Helper()
 	app, r := newTestApp(t)
@@ -226,7 +224,6 @@ func TestCreateSubjectRequiresAdmin(t *testing.T) {
 	assertStatus(t, w, http.StatusUnauthorized)
 }
 
-// createTestSubject creates a subject through the API and returns it.
 func createTestSubject(t *testing.T, r *gin.Engine, token string, language Language, slugText string) Subject {
 	t.Helper()
 	w := doRequest(t, r, http.MethodPost, subjectsPath, token, map[string]any{

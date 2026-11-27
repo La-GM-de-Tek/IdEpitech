@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// buildSubject expects req to have gone through formatCreateSubjectRequest.
 func buildSubject(req createSubjectRequest) Subject {
 	return Subject{
 		Name:          req.Name,
@@ -20,7 +19,6 @@ func buildSubject(req createSubjectRequest) Subject {
 	}
 }
 
-// buildSteps positions the steps in array order, ignoring their "position" field.
 func buildSteps(reqs []createStepRequest) []Step {
 	steps := make([]Step, len(reqs))
 	for i, s := range reqs {
@@ -42,7 +40,7 @@ func buildHints(hints []string) json.RawMessage {
 	if len(hints) == 0 {
 		return nil
 	}
-	raw, _ := json.Marshal(hints) // a []string always marshals
+	raw, _ := json.Marshal(hints)
 	return raw
 }
 

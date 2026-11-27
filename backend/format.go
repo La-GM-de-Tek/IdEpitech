@@ -99,7 +99,6 @@ func formatSubjectName(c *gin.Context, name string) (string, bool) {
 	return result, true
 }
 
-// formatSlug normalizes text into a URL slug ("Fil d'Ariane" -> "fil-dariane").
 func formatSlug(c *gin.Context, text string) (string, bool) {
 	result := slug.Make(text)
 
@@ -132,7 +131,6 @@ func formatStepTitle(c *gin.Context, title string) (string, bool) {
 	return result, true
 }
 
-// formatCreateSubjectRequest fills req.Slug from req.Name when it is missing or empty.
 func formatCreateSubjectRequest(c *gin.Context, req *createSubjectRequest) bool {
 	var ok bool
 	if req.Name, ok = formatSubjectName(c, req.Name); !ok {

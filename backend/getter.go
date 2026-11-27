@@ -28,7 +28,6 @@ func getMe(c *gin.Context, db *gorm.DB, user *User, fields ...string) bool {
 	return true
 }
 
-// getSubject finds a subject by numeric id, or by slug otherwise.
 func getSubject(c *gin.Context, db *gorm.DB, idOrSlug string, subject *Subject) bool {
 	query := db.WithContext(c.Request.Context())
 	if id, err := strconv.ParseUint(idOrSlug, 10, 64); err == nil {

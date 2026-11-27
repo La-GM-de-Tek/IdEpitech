@@ -108,7 +108,7 @@ func buildSubjectUpdates(c *gin.Context, req updateSubjectRequest) (map[string]a
 		updates["difficulty"] = *req.Difficulty
 	}
 
-	// Unchecked fields: the foreign key validates langage
+	// Unchecked fields
 	if req.Langage != nil {
 		updates["langage"] = *req.Langage
 	}
@@ -134,7 +134,6 @@ func applySubjectUpdates(c *gin.Context, db *gorm.DB, subject *Subject, updates 
 	return checkSubjectWrite(c, "applySubjectUpdates", err)
 }
 
-// checkSubjectWrite answers the error of a subject insert or update and returns false, or returns true if err is nil.
 func checkSubjectWrite(c *gin.Context, caller string, err error) bool {
 	if errors.Is(err, gorm.ErrDuplicatedKey) {
 		respondError(c, http.StatusConflict, "CONFLICT", "slug already taken")
