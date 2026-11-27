@@ -399,7 +399,7 @@ Crée le sujet, éventuellement avec ses étapes en une seule requête.
 | Paramètre        | Où   | Type    | Requis | Description                                                           |
 | ---------------- | ---- | ------- | :----: | --------------------------------------------------------------------- |
 | `name`           | body | string  |   ✅   | Nom affiché (`Fil d'Ariane`)                                          |
-| `slug`           | body | string  |   ❌   | Unique, généré depuis `name` si absent                                |
+| `slug`           | body | string  |   ❌   | Unique, généré depuis `name` si absent, normalisé (`Mon Sujet` → `mon-sujet`) |
 | `langage`        | body | integer |   ✅   | `id` d'un `Language`                                                  |
 | `description`    | body | string  |   ❌   |                                                                       |
 | `difficulty`     | body | integer |   ✅   | `0` à `3`                                                             |
