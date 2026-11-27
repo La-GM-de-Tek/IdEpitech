@@ -34,7 +34,9 @@ type reorderStepsRequest struct {
 
 func (app *App) handleListSteps(c *gin.Context) {
 	var uri subjectURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -42,8 +44,12 @@ func (app *App) handleListSteps(c *gin.Context) {
 func (app *App) handleCreateStep(c *gin.Context) {
 	var uri subjectURI
 	var req createStepRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -51,8 +57,12 @@ func (app *App) handleCreateStep(c *gin.Context) {
 func (app *App) handleUpdateStep(c *gin.Context) {
 	var uri stepURI
 	var req updateStepRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -60,15 +70,21 @@ func (app *App) handleUpdateStep(c *gin.Context) {
 func (app *App) handleReorderSteps(c *gin.Context) {
 	var uri subjectURI
 	var req reorderStepsRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteStep(c *gin.Context) {
 	var uri stepURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }

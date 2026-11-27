@@ -38,14 +38,18 @@ type importSubjectsRequest struct {
 
 func (app *App) handleListMySubjects(c *gin.Context) {
 	var query listUserSubjectsQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleGetMySubject(c *gin.Context) {
 	var uri mySubjectURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -53,22 +57,30 @@ func (app *App) handleGetMySubject(c *gin.Context) {
 func (app *App) handleValidateStep(c *gin.Context) {
 	var uri myStepURI
 	var req validateStepRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleResetMySubject(c *gin.Context) {
 	var uri mySubjectURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleImportMySubjects(c *gin.Context) {
 	var req importSubjectsRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -76,15 +88,21 @@ func (app *App) handleImportMySubjects(c *gin.Context) {
 func (app *App) handleListUserSubjects(c *gin.Context) {
 	var uri userURI
 	var query listUserSubjectsQuery
-	bindURI(c, &uri)
-	bindQuery(c, &query)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleGetUserSubject(c *gin.Context) {
 	var uri userSubjectURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }

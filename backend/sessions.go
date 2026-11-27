@@ -39,7 +39,9 @@ type redeemSessionRequest struct {
 
 func (app *App) handleListSessions(c *gin.Context) {
 	var query listSessionsQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -51,14 +53,18 @@ func (app *App) handleListCampuses(c *gin.Context) {
 
 func (app *App) handleGetSession(c *gin.Context) {
 	var uri sessionURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleCreateSession(c *gin.Context) {
 	var req createSessionRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -66,15 +72,21 @@ func (app *App) handleCreateSession(c *gin.Context) {
 func (app *App) handleUpdateSession(c *gin.Context) {
 	var uri sessionURI
 	var req updateSessionRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteSession(c *gin.Context) {
 	var uri sessionURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -82,22 +94,30 @@ func (app *App) handleDeleteSession(c *gin.Context) {
 func (app *App) handleListSessionUsers(c *gin.Context) {
 	var uri sessionURI
 	var query pageQuery
-	bindURI(c, &uri)
-	bindQuery(c, &query)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleRedeemSession(c *gin.Context) {
 	var req redeemSessionRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleListMySessions(c *gin.Context) {
 	var query pageQuery
-	bindQuery(c, &query)
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -105,8 +125,12 @@ func (app *App) handleListMySessions(c *gin.Context) {
 func (app *App) handleListUserSessions(c *gin.Context) {
 	var uri userURI
 	var query pageQuery
-	bindURI(c, &uri)
-	bindQuery(c, &query)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindQuery(c, &query) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }

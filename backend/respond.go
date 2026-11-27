@@ -38,14 +38,26 @@ func respondNotImplemented(c *gin.Context) {
 	respondError(c, http.StatusNotImplemented, "NOT_IMPLEMENTED", "route not implemented yet")
 }
 
-func bindURI(c *gin.Context, req any) {
-	_ = c.ShouldBindUri(req)
+func bindURI(c *gin.Context, req any) bool {
+	if err := c.ShouldBindUri(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid uri parameters"})
+		return false
+	}
+	return true
 }
 
-func bindQuery(c *gin.Context, req any) {
-	_ = c.ShouldBindQuery(req)
+func bindQuery(c *gin.Context, req any) bool {
+	if err := c.ShouldBindQuery(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid query parameters"})
+		return false
+	}
+	return true
 }
 
-func bindBody(c *gin.Context, req any) {
-	_ = c.ShouldBind(req)
+func bindBody(c *gin.Context, req any) bool {
+	if err := c.ShouldBind(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return false
+	}
+	return true
 }

@@ -17,14 +17,18 @@ func (app *App) handleListLanguages(c *gin.Context) {
 
 func (app *App) handleGetLanguage(c *gin.Context) {
 	var uri languageURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleCreateLanguage(c *gin.Context) {
 	var req languageRequest
-	bindBody(c, &req)
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
@@ -32,15 +36,21 @@ func (app *App) handleCreateLanguage(c *gin.Context) {
 func (app *App) handleUpdateLanguage(c *gin.Context) {
 	var uri languageURI
 	var req languageRequest
-	bindURI(c, &uri)
-	bindBody(c, &req)
+	if !bindURI(c, &uri) {
+		return
+	}
+	if !bindBody(c, &req) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
 
 func (app *App) handleDeleteLanguage(c *gin.Context) {
 	var uri languageURI
-	bindURI(c, &uri)
+	if !bindURI(c, &uri) {
+		return
+	}
 	// TODO
 	respondNotImplemented(c)
 }
