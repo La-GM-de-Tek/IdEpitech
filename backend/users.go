@@ -16,7 +16,7 @@ type updateMeRequest struct {
 	Image    *string `json:"image"`
 }
 
-type updatePasswordRequest struct {
+type updateMePasswordRequest struct {
 	CurrentPassword string `json:"current_password"`
 	NewPassword     string `json:"new_password"`
 }
@@ -40,7 +40,7 @@ type updateUserRequest struct {
 
 func (app *App) handleMe(c *gin.Context) {
 	var user User
-	if !getUserMe(c, app.db, &user) {
+	if !getMe(c, app.db, &user) {
 		return
 	}
 
@@ -50,14 +50,13 @@ func (app *App) handleMe(c *gin.Context) {
 func (app *App) handleUpdateMe(c *gin.Context) {
 	var req updateMeRequest
 	bindBody(c, &req)
-
-	var user User
-	if !getUserMe(c, app.db, &user) {
+	updates, ok := buildMeUpdates(c, req)
+	if !ok {
 		return
 	}
 
-	updates, ok := buildUserMeUpdates(c, req)
-	if !ok {
+	var user User
+	if !getMe(c, app.db, &user) {
 		return
 	}
 	if !applyUserUpdates(c, app.db, &user, updates) {
@@ -67,11 +66,29 @@ func (app *App) handleUpdateMe(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (app *App) handleUpdateMyPassword(c *gin.Context) {
-	var req updatePasswordRequest
+// TODO: Les JWT restent valides après le changement
+// TODO: Rate Limit
+func (app *App) handleUpdateMePassword(c *gin.Context) {
+	var req updateMePasswordRequest
 	bindBody(c, &req)
-	// TODO
-	respondNotImplemented(c)
+	if !formatMePasswordRequest(c, &req) {
+		return
+	}
+
+	var user User
+	if !getMe(c, app.db, &user, "id", "password") {
+		return
+	}
+
+	updates, ok := buildMePasswordUpdates(c, req, user.Password)
+	if !ok {
+		return
+	}
+	if !applyUserUpdates(c, app.db, &user, updates) {
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
 func (app *App) handleDeleteMe(c *gin.Context) {

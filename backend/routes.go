@@ -15,7 +15,7 @@ func (app *App) registerRoutes(r *gin.Engine) {
 
 	user.GET("/users/me", app.handleMe)
 	user.PATCH("/users/me", app.handleUpdateMe)
-	user.PATCH("/users/me/password", app.handleUpdateMyPassword)
+	user.PATCH("/users/me/password", app.handleUpdateMePassword)
 	user.DELETE("/users/me", app.handleDeleteMe)
 	admin.GET("/users", app.handleListUsers)
 	user.GET("/users/:id", app.handleGetUser)
